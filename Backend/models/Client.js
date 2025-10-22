@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 
 const clientSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
-  // basic signup-time fields
   companyName: { type: String },
   location: {
     address: String,
