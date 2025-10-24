@@ -22,8 +22,7 @@ function App() {
       location.pathname.startsWith("/signup")
     ) {
       return <AuthNavbar />;
-    }else if(location.pathname.startsWith("/clientDashboard") ||
-    location.pathname.startsWith("/freelancerDashboard")){
+    }else if(location.pathname.startsWith("/freelancerDashboard")){
       return <UserNavbar />;
     }
     return null;

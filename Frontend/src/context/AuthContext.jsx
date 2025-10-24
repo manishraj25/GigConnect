@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await API.get("/auth/protected");
+        const res = await API.get("/auth/me" , {withCredentials: true});
         setUser(res.data.user);
       } catch (err) {
         setUser(null);
@@ -54,3 +54,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+export { AuthContext };
