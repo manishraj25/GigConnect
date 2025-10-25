@@ -8,7 +8,6 @@ import HomeNavbar from "./components/HomeNavbar";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import ClientDashboard from "./pages/ClientDashboard.jsx";
 import FreelancerDashboard from "./pages/FreelancerDashboard.jsx";
-import UserNavbar from "./components/UserNavbar.jsx";
 
 function App() {
   const location = useLocation();
@@ -22,8 +21,6 @@ function App() {
       location.pathname.startsWith("/signup")
     ) {
       return <AuthNavbar />;
-    }else if(location.pathname.startsWith("/freelancerDashboard")){
-      return <UserNavbar />;
     }
     return null;
   };
