@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import User from '../models/user.js';
+import User from '../models/User.js';
 import generateToken from '../utils/generateToken.js';
 
 //Register
@@ -85,5 +85,7 @@ const logoutUser = async (req, res) => {
     }
 }
 
-export { registerUser, loginUser, logoutUser };
+
+
+export { registerUser, loginUser, logoutUser};
 
