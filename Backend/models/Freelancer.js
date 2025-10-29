@@ -15,7 +15,9 @@ const freelancerSchema = new mongoose.Schema({
   
   skills: { type: [String], default: [] },
 
-  headline: { type: String }, // Short tagline
+  headline: { type: String, default: "" }, // Freelancer headline
+
+  domains: { type: [String], default: [] },
 
   about: { type: String, default: "" }, // Freelancer about section
 

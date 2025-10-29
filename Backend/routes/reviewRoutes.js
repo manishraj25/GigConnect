@@ -7,16 +7,16 @@ import {
 } from "../controllers/reviewController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
-const router = express.Router();
+const reviewRouter = express.Router();
 
 // Get all reviews for a gig
-router.get("/:gigId", getReviewsForGig);
+reviewRouter.get("/:gigId", getReviewsForGig);
 
 // Add a new review (client)
-router.post("/:gigId", protect, createReview);
+reviewRouter.post("/:gigId", protect, createReview);
 
 // Update or delete review (only reviewer)
-router.put("/:reviewId", protect, updateReview);
-router.delete("/:reviewId", protect, deleteReview);
+reviewRouter.put("/:reviewId", protect, updateReview);
+reviewRouter.delete("/:reviewId", protect, deleteReview);
 
-export default router;
+export default reviewRouter;

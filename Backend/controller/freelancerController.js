@@ -8,7 +8,7 @@ import cloudinary from "../config/cloudinary.js";
 export const upsertFreelancerProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { skills, headline, about, location, portfolio } = req.body;
+    const { skills, headline, domains, about, location, portfolio } = req.body;
     let profileImage = {};
 
     // ✅ Upload new profile image if provided
@@ -29,6 +29,7 @@ export const upsertFreelancerProfile = async (req, res) => {
 
       existingFreelancer.skills = skills || existingFreelancer.skills;
       existingFreelancer.headline = headline || existingFreelancer.headline;
+      existingFreelancer.domains = domains || existingFreelancer.domains;
       existingFreelancer.about = about || existingFreelancer.about;
       existingFreelancer.location = location || existingFreelancer.location;
       existingFreelancer.profileImage = profileImage.url
@@ -47,6 +48,7 @@ export const upsertFreelancerProfile = async (req, res) => {
       user: userId,
       skills,
       headline,
+      domains,
       about,
       location,
       profileImage,

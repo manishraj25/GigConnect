@@ -4,10 +4,7 @@ const gigsSchema = new mongoose.Schema({
     freelancer: { type: mongoose.Schema.Types.ObjectId, ref: "Freelancer", required: true },
     title: { type: String, required: true, trim: true },
     description: { type: String, required: true },
-    price: {
-        minprice: { type: Number, required: true },
-        maxprice: { type: Number, required: true }
-    },
+    price: { type: Number, required: true},
 
     deliveryTime: { type: Number, required: true }, // in days
 

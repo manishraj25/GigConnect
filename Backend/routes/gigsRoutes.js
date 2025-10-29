@@ -9,13 +9,13 @@ import {
 import { protect } from "../middleware/authMiddleware.js";
 import upload from "../middleware/upload.js";
 
-const router = express.Router();
+const gigsRouter = express.Router();
 
-router.get("/", getAllGigs);
-router.get("/:id", getGigById);
+gigsRouter.get("/", getAllGigs);
+gigsRouter.get("/:id", getGigById);
 
-router.post("/", protect, upload.array("images", 5), createGig);
-router.put("/:id", protect, upload.array("images", 5), updateGig);
-router.delete("/:id", protect, deleteGig);
+gigsRouter.post("/", protect, upload.array("images", 5), createGig);
+gigsRouter.put("/:id", protect, upload.array("images", 5), updateGig);
+gigsRouter.delete("/:id", protect, deleteGig);
 
-export default router;
+export default gigsRouter;

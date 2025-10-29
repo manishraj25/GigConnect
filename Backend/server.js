@@ -5,6 +5,11 @@ import cookieParser from 'cookie-parser';
 dotenv.config();
 import connectDB from './config/db.js';
 import authRouter from './routes/authRoutes.js';
+import clientRouter from './routes/clientRoutes.js';
+import freelancerRouter from './routes/freelancerRoutes.js';
+import gigsRouter from './routes/gigsRoutes.js';
+import reviewRouter from './routes/reviewRoutes.js';
+import searchRouter from './routes/searchRoutes.js';
 
 const app = express();
 
@@ -21,6 +26,11 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/api/auth', authRouter);
+app.use('/api/clients', clientRouter);
+app.use('/api/freelancers', freelancerRouter);
+app.use('/api/gigs', gigsRouter);
+app.use('/api/reviews', reviewRouter);
+app.use('/api/search', searchRouter);
 
 
 

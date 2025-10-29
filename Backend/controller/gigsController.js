@@ -91,26 +91,48 @@ export const deleteGig = async (req, res) => {
   }
 };
 
-//GET all gigs
+// ====================================================
+// 📌 Get All Gigs (with full freelancer info)
+// ====================================================
 export const getAllGigs = async (req, res) => {
   try {
-    const gigs = await Gigs.find().populate("freelancer", "name location");
-    res.json(gigs);
+    const gigs = await Gigs.find()
+      .populate({
+        path: "freelancer",
+        populate: {
+          path: "user",
+          select: "name email"
+        }
+      })
+      .select("-__v");
+
+    res.status(200).json({
+      totalResults: gigs.length,
+      gigs
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-//GET single gig
+// ====================================================
+// 📌 Get Single Gig by ID (Full Details)
+// ====================================================
 export const getGigById = async (req, res) => {
   try {
-    const gig = await Gigs.findById(req.params.id).populate(
-      "freelancer",
-      "name location about skills"
-    );
+    const gig = await Gigs.findById(req.params.id)
+      .populate({
+        path: "freelancer",
+        populate: {
+          path: "user",
+          select: "name email"
+        }
+      })
+      .select("-__v");
+
     if (!gig) return res.status(404).json({ message: "Gig not found" });
 
-    res.json(gig);
+    res.status(200).json(gig);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

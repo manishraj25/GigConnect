@@ -19,25 +19,52 @@ export const createProject = async (req, res) => {
   }
 };
 
-// ✅ Get all projects
+// ====================================================
+// 📌 Get All Projects (Full client details)
+// ====================================================
 export const getAllProjects = async (req, res) => {
   try {
     const projects = await ProjectPost.find()
-      .populate("client", "name email")
-      .sort({ createdAt: -1 });
-    res.json(projects);
+      .populate({
+        path: "client",
+        populate: {
+          path: "user",
+          select: "name email"
+        },
+        select: "companyName location"
+      })
+      .sort({ createdAt: -1 })
+      .select("-__v");
+
+    res.status(200).json({
+      totalResults: projects.length,
+      projects
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// ✅ Get single project by ID
+// ====================================================
+// 📌 Get Single Project by ID (Full details)
+// ====================================================
 export const getProjectById = async (req, res) => {
   try {
     const project = await ProjectPost.findById(req.params.id)
-      .populate("client", "name email");
-    if (!project) return res.status(404).json({ message: "Project not found" });
-    res.json(project);
+      .populate({
+        path: "client",
+        populate: {
+          path: "user",
+          select: "name email"
+        },
+        select: "companyName location"
+      })
+      .select("-__v");
+
+    if (!project)
+      return res.status(404).json({ message: "Project not found" });
+
+    res.status(200).json(project);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -1,12 +1,12 @@
 import express from "express";
 import { searchFreelancers, searchProjects } from "../controllers/searchController.js";
 
-const router = express.Router();
+const searchRouter = express.Router();
 
 // Clients → Search Freelancers
-router.get("/freelancers", searchFreelancers);
+searchRouter.get("/freelancers", searchFreelancers);
 
 // Freelancers → Search Projects
-router.get("/projects", searchProjects);
+searchRouter.get("/projects", searchProjects);
 
-export default router;
+export default searchRouter;
