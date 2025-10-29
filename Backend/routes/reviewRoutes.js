@@ -4,8 +4,8 @@ import {
   getReviewsForGig,
   updateReview,
   deleteReview
-} from "../controllers/reviewController.js";
-import { protect } from "../middleware/authMiddleware.js";
+} from "../controller/reviewController.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const reviewRouter = express.Router();
 
@@ -13,10 +13,10 @@ const reviewRouter = express.Router();
 reviewRouter.get("/:gigId", getReviewsForGig);
 
 // Add a new review (client)
-reviewRouter.post("/:gigId", protect, createReview);
+reviewRouter.post("/:gigId", authMiddleware, createReview);
 
 // Update or delete review (only reviewer)
-reviewRouter.put("/:reviewId", protect, updateReview);
-reviewRouter.delete("/:reviewId", protect, deleteReview);
+reviewRouter.put("/:reviewId", authMiddleware, updateReview);
+reviewRouter.delete("/:reviewId", authMiddleware, deleteReview);
 
 export default reviewRouter;

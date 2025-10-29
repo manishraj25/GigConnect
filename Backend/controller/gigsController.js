@@ -1,4 +1,4 @@
-import Gigs from "../models/Gig.js";
+import Gigs from "../models/Gigs.js";
 import cloudinary from "../config/cloudinary.js";
 
 //create gig

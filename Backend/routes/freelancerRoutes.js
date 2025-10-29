@@ -6,10 +6,10 @@ import {
   updateUserInfo,
   deleteFreelancerProfile,
   getFreelancerById,
-} from "../controllers/freelancerController.js";
+} from "../controller/freelancerController.js";
 
-import { authMiddleware } from "../middleware/authMiddleware.js";
-import upload from "../middleware/multer.js"; // ✅ your Cloudinary multer middleware
+import authMiddleware  from "../middleware/authMiddleware.js";
+import upload from "../middleware/upload.js"; 
 
 const freelancerRouter = express.Router();
 

@@ -5,7 +5,7 @@ import {
   getProjectById,
   updateProject,
   deleteProject
-} from "../controllers/projectController.js";
+} from "../controller/projectController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();

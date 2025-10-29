@@ -4,7 +4,7 @@ import {
   getProposalsForProject,
   getMyProposals,
   updateProposalStatus
-} from "../controllers/proposalController.js";
+} from "../controller/proposalController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();

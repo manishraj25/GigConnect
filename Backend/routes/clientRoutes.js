@@ -1,35 +1,32 @@
 import express from "express";
-import multer from "multer";
+import upload from "../middleware/upload.js";
 import {
   upsertClientProfile,
   getMyProfile,
   updateUserInfo,
   deleteClientProfile,
   getClientById,
-} from "../controllers/clientController.js";
-import { protect } from "../middleware/authMiddleware.js";
+} from "../controller/clientController.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const clientRouter = express.Router();
 
-// ✅ Multer setup for image uploads (Cloudinary)
-const storage = multer.diskStorage({});
-const upload = multer({ storage });
 
 // ------------------------------------
 // 🔒 Private Routes (Client logged in)
 // ------------------------------------
 
 // Create or update client profile
-clientRouter.post("/profile", protect, upload.single("profileImage"), upsertClientProfile);
+clientRouter.post("/profile", authMiddleware, upload.single("profileImage"), upsertClientProfile);
 
 // Get my profile (client dashboard)
-clientRouter.get("/me", protect, getMyProfile);
+clientRouter.get("/me", authMiddleware, getMyProfile);
 
 // Update basic user info (name, email, password)
-clientRouter.put("/update-user", protect, updateUserInfo);
+clientRouter.put("/update-user", authMiddleware, updateUserInfo);
 
 // Delete client profile
-clientRouter.delete("/delete", protect, deleteClientProfile);
+clientRouter.delete("/delete", authMiddleware, deleteClientProfile);
 
 // ------------------------------------
 // 🌍 Public Route (Freelancers can view)
