@@ -94,7 +94,7 @@ const Signup = () => {
           value={formData.password}
         />
 
-        {/* ✅ Terms and Conditions Checkbox */}
+        {/* Terms and Conditions Checkbox */}
         <div className="flex items-center mt-4 mb-5">
           <input
             id="agree"

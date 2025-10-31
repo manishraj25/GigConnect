@@ -3,7 +3,7 @@ import Gigs from "../models/Gigs.js";
 import Freelancer from "../models/Freelancer.js";
 import Client from "../models/Client.js";
 
-// ✅ Create a new review
+//Create a new review
 export const createReview = async (req, res) => {
   try {
     const { gigId } = req.params;
@@ -45,7 +45,7 @@ export const createReview = async (req, res) => {
   }
 };
 
-// ✅ Get all reviews for a gig (with reviewer profile image)
+//Get all reviews for a gig (with reviewer profile image)
 export const getReviewsForGig = async (req, res) => {
   try {
     const { gigId } = req.params;
@@ -93,7 +93,7 @@ export const getReviewsForGig = async (req, res) => {
   }
 };
 
-// ✅ Update a review (only by reviewer)
+//Update a review (only by reviewer)
 export const updateReview = async (req, res) => {
   try {
     const { reviewId } = req.params;
@@ -125,7 +125,7 @@ export const updateReview = async (req, res) => {
   }
 };
 
-// ✅ Delete review (only by reviewer)
+//Delete review (only by reviewer)
 export const deleteReview = async (req, res) => {
   try {
     const { reviewId } = req.params;

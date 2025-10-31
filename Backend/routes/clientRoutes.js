@@ -12,9 +12,7 @@ import authMiddleware from "../middleware/authMiddleware.js";
 const clientRouter = express.Router();
 
 
-// ------------------------------------
-// 🔒 Private Routes (Client logged in)
-// ------------------------------------
+
 
 // Create or update client profile
 clientRouter.post("/profile", authMiddleware, upload.single("profileImage"), upsertClientProfile);
@@ -28,9 +26,7 @@ clientRouter.put("/update-user", authMiddleware, updateUserInfo);
 // Delete client profile
 clientRouter.delete("/delete", authMiddleware, deleteClientProfile);
 
-// ------------------------------------
-// 🌍 Public Route (Freelancers can view)
-// ------------------------------------
+
 
 // Get a specific client profile (public view)
 clientRouter.get("/:id", getClientById);

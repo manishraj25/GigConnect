@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 
 const AuthNavbar = () => {
     const location = useLocation();
@@ -15,15 +15,15 @@ const AuthNavbar = () => {
         setSelectedRole(role);
         localStorage.setItem("role", role);
 
-        // Stay on signup if already there
+
         navigate("/signup", { state: { role } });
     };
 
     if (location.pathname === "/roles" || location.pathname === "/login") {
         return (
-            <nav >
+            <nav className="sticky top-0 z-50 w-full">
                 <div className="flex px-4 sm:px-8 justify-between  items-center py-3 sm:py-4 bg-gray-100 text-black stick top-0">
-                    <h1 className="text-lg sm:text-xl font-bold"><span>Gig</span><span className='text-green-600'>Connect</span></h1>
+                    <Link to="/" className="text-lg sm:text-xl font-bold"><span>Gig</span><span className='text-green-600'>Connect</span></Link>
                 </div>
             </nav>
         );
@@ -31,9 +31,9 @@ const AuthNavbar = () => {
 
 
     return (
-        <nav >
+        <nav className="sticky top-0 z-50 w-full">
             <div className="flex px-4 sm:px-8 justify-between  items-center py-3 sm:py-4 bg-gray-100 text-black stick top-0">
-                <h1 className="text-lg sm:text-xl font-bold"><span>Gig</span><span className='text-green-600'>Connect</span></h1>
+                <Link to="/" className="text-lg sm:text-xl font-bold"><span>Gig</span><span className='text-green-600'>Connect</span></Link>
 
                 <div className="flex gap-3">
                     <button
@@ -43,8 +43,7 @@ const AuthNavbar = () => {
                                 ? " cursor-text"
                                 : "text-green-600 cursor-pointer hover:underline"
                             }`}
-                    >
-                        Client
+                    >Join as Client
                     </button>
                     <button
                         onClick={() => handleRoleChange("freelancer")}
@@ -54,7 +53,7 @@ const AuthNavbar = () => {
                                 : "text-green-600 cursor-pointer hover:underline"
                             }`}
                     >
-                        Freelancer
+                    Join as Freelancer
                     </button>
                 </div>
             </div>

@@ -1,11 +1,13 @@
 import Gigs from "../models/Gigs.js";
+import Freelancer from "../models/Freelancer.js";
+import User from "../models/User.js";
 import cloudinary from "../config/cloudinary.js";
 
 //create gig
 export const createGig = async (req, res) => {
   try {
     const { title, description, price, deliveryTime } = req.body;
-    const freelancer = req.user?._id;
+    const freelancer = await Freelancer.findOne({ user: req.user.id });
 
     if (!title || !description || !price || !deliveryTime) {
       return res.status(400).json({ message: "All fields are required" });
@@ -18,7 +20,7 @@ export const createGig = async (req, res) => {
     })) || [];
 
     const gig = await Gigs.create({
-      freelancer,
+      freelancer: freelancer._id,
       title,
       description,
       price: JSON.parse(price), 
@@ -38,7 +40,7 @@ export const updateGig = async (req, res) => {
     const gig = await Gigs.findById(req.params.id);
     if (!gig) return res.status(404).json({ message: "Gig not found" });
 
-    if (gig.freelancer.toString() !== req.user._id.toString()) {
+    if (gig.freelancer.toString() !== req.user.id.toString()) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
@@ -75,7 +77,7 @@ export const deleteGig = async (req, res) => {
     const gig = await Gigs.findById(req.params.id);
     if (!gig) return res.status(404).json({ message: "Gig not found" });
 
-    if (gig.freelancer.toString() !== req.user._id.toString()) {
+    if (gig.freelancer.toString() !== req.user.id.toString()) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
@@ -91,9 +93,7 @@ export const deleteGig = async (req, res) => {
   }
 };
 
-// ====================================================
-// 📌 Get All Gigs (with full freelancer info)
-// ====================================================
+//Get all gigs
 export const getAllGigs = async (req, res) => {
   try {
     const gigs = await Gigs.find()
@@ -115,9 +115,7 @@ export const getAllGigs = async (req, res) => {
   }
 };
 
-// ====================================================
-// 📌 Get Single Gig by ID (Full Details)
-// ====================================================
+//Get gig by ID
 export const getGigById = async (req, res) => {
   try {
     const gig = await Gigs.findById(req.params.id)

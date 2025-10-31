@@ -1,7 +1,7 @@
 import Proposal from "../models/Proposal.js";
 import ProjectPost from "../models/ProjectPost.js";
 
-// ✅ Submit proposal (freelancer)
+//Submit proposal (freelancer)
 export const submitProposal = async (req, res) => {
   try {
     const { projectId } = req.params;
@@ -28,7 +28,7 @@ export const submitProposal = async (req, res) => {
   }
 };
 
-// ✅ Get all proposals for a project (client)
+//Get all proposals for a project (client)
 export const getProposalsForProject = async (req, res) => {
   try {
     const projectId = req.params.projectId;
@@ -41,7 +41,7 @@ export const getProposalsForProject = async (req, res) => {
   }
 };
 
-// ✅ Get freelancer’s proposals
+//Get freelancer’s proposals
 export const getMyProposals = async (req, res) => {
   try {
     const freelancer = req.user._id;
@@ -53,7 +53,7 @@ export const getMyProposals = async (req, res) => {
   }
 };
 
-// ✅ Update proposal status (client only)
+//Update proposal status (client only)
 export const updateProposalStatus = async (req, res) => {
   try {
     const { proposalId } = req.params;

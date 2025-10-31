@@ -13,25 +13,23 @@ import upload from "../middleware/upload.js";
 
 const freelancerRouter = express.Router();
 
-// ---------------------------------------
-// 🧑‍💼 Freelancer Profile Management
-// ---------------------------------------
 
-// ✅ Create or Update Freelancer Profile
+
+// Create or Update Freelancer Profile
 freelancerRouter.post(
   "/profile",
   authMiddleware,
-  upload.single("profileImage"), // single profile image
+  upload.single("profileImage"), 
   upsertFreelancerProfile
 );
 
-// ✅ Get Logged-in Freelancer Profile
+// Get Logged-in Freelancer Profile
 freelancerRouter.get("/me", authMiddleware, getMyProfile);
 
-// ✅ Update User Info (Name, Email, Password)
+//Update User Info (Name, Email, Password)
 freelancerRouter.put("/update-user", authMiddleware, updateUserInfo);
 
-// ✅ Add Portfolio Item (Multiple Images)
+//Add Portfolio Item (Multiple Images)
 freelancerRouter.post(
   "/portfolio",
   authMiddleware,
@@ -39,14 +37,12 @@ freelancerRouter.post(
   addPortfolioItem
 );
 
-// ✅ Delete Freelancer Profile
+//Delete Freelancer Profile
 freelancerRouter.delete("/delete", authMiddleware, deleteFreelancerProfile);
 
-// ---------------------------------------
-// 🌍 Public Route (for Clients)
-// ---------------------------------------
 
-// ✅ Get Freelancer Profile by ID (public)
+
+//Get Freelancer Profile by ID (public)
 freelancerRouter.get("/:id", getFreelancerById);
 
 export default freelancerRouter;

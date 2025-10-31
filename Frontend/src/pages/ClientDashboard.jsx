@@ -1,64 +1,63 @@
-// ClientDashboard.jsx
 import React, { useContext, useEffect, useState, useRef } from "react";
 import { AuthContext, useAuth } from "../context/AuthContext.jsx";
-import { useNavigate } from "react-router-dom";
-import API from "../api/api.js";
+import API from "../api/api.js"
 import Avtar from "../assets/profile.png";
+import GigCard from "../components/GigCard.jsx";
 
 const ClientDashboard = () => {
     const { user } = useContext(AuthContext);
     const [activeTab, setActiveTab] = useState("dashboard");
-    const [freelancers, setFreelancers] = useState([]);
-    const [filteredFreelancers, setFilteredFreelancers] = useState([]);
-    const [messages, setMessages] = useState([]);
+    const [gigs, setGigs] = useState([]);
     const [search, setSearch] = useState("");
-    const [loading, setLoading] = useState(false);
     const { logout } = useAuth();
     const [menuOpen, setMenuOpen] = useState(false);
 
-    // NEW States 🌟
+    const [selectCategories, setSelectCategories] = useState("");
     const [suggestions, setSuggestions] = useState([]);
-    const [saveList, setSaveList] = useState([]);
-    const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(false);
 
-    const navigate = useNavigate();
+
+
     const menuRef = useRef(null);
 
+
     const categories = [
-        "Web Developer", "UI/UX Designer", "Logo Designer",
-        "Mobile Developer", "Video Editor", "Full Stack Developer",
-        "Backend Developer"
+        "Web Developer",
+        "UI/UX Designer",
+        "Logo Designer",
+        "Mobile Developer",
+        "Video Editor",
+        "Full Stack Developer",
+        "Backend Developer",
     ];
 
-    // ✅ Dummy explore freelancers
-    const dummyFreelancers = [
-        {
-            _id: 1,
-            name: "Rahul Sharma",
-            skills: ["Web Dev", "React", "Node"],
-            profilePic: null,
-        },
-        {
-            _id: 2,
-            name: "Priya Verma",
-            skills: ["UI/UX", "Figma"],
-            profilePic: null,
-        },
-        {
-            _id: 3,
-            name: "Aman Singh",
-            skills: ["Backend", "Express"],
-            profilePic: null,
-        },
-        {
-            _id: 4,
-            name: "Sara Khan",
-            skills: ["Mobile Dev", "Flutter"],
-            profilePic: null,
-        },
-    ];
+    //Fetch all gigs
+    useEffect(() => {
+        const fetchAllGigs = async () => {
+            setLoading(true);
+            try {
+                const res = await API.get(`/gigs`);
+                console.log("Fetched gigs:", res.data);
 
-    // ✅ Close profile menu when clicking outside
+                // Some APIs return array, some return { gigs: [...] }
+                const fetched = Array.isArray(res.data) ? res.data : res.data.gigs;
+                setGigs(fetched || []);
+            } catch (err) {
+                console.error("Error fetching gigs:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        if (activeTab === "dashboard") fetchAllGigs();
+    }, [activeTab]);
+
+    //Handle category change
+    const handleCategories = (event) => {
+        setSelectCategories(event.target.value);
+    };
+
+
+    // Close profile menu when clicking outside
     useEffect(() => {
         const handler = (e) => {
             if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -69,107 +68,47 @@ const ClientDashboard = () => {
         return () => document.removeEventListener("mousedown", handler);
     }, []);
 
-    // ✅ Fetch freelancers
-    useEffect(() => {
-        if (activeTab === "dashboard") {
-            const fetchFreelancers = async () => {
-                setLoading(true);
-                try {
-                    const res = await API.get(`/api/freelancers?page=${page}`);
-                    if (page === 1) {
-                        setFreelancers(res.data);
-                        setFilteredFreelancers(res.data);
-                    } else {
-                        setFreelancers((p) => [...p, ...res.data]);
-                        setFilteredFreelancers((p) => [...p, ...res.data]);
-                    }
-                } catch (err) {
-                    console.error(err);
-                } finally {
-                    setLoading(false);
-                }
-            };
-            fetchFreelancers();
-        }
-    }, [activeTab, page]);
 
-    // ✅ Infinite scroll trigger
-    useEffect(() => {
-        const onScroll = () => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 3) {
-                setPage((prev) => prev + 1);
-            }
-        };
-        window.addEventListener("scroll", onScroll);
-        return () => window.removeEventListener("scroll", onScroll);
-    }, []);
 
-    // ✅ Suggestions while typing
+
+    //Suggestions while typing
     const handleTyping = (e) => {
         const text = e.target.value;
         setSearch(text);
 
         if (!text) return setSuggestions([]);
 
-        const filtered = categories.filter(c =>
+        const filtered = categories.filter((c) =>
             c.toLowerCase().includes(text.toLowerCase())
         );
-
-        const names = freelancers
-            .map(f => f.name)
-            .filter(n => n.toLowerCase().includes(text.toLowerCase()));
-
-        setSuggestions([...filtered, ...names]);
+        setSuggestions(filtered);
     };
 
-    // ✅ Click suggestion
+    //Click suggestion
     const applySuggestion = (value) => {
         setSearch(value);
         setSuggestions([]);
     };
 
-    // ✅ Go to search result page
-    const goSearchResults = () => {
-        if (!search.trim()) return;
-        navigate(`/search?query=${search}`);
-    };
+    //Filter gigs based on selected category
+    const displayedGigs = gigs.filter((gig) =>
+        selectCategories
+            ? gig.category?.toLowerCase() === selectCategories.toLowerCase()
+            : true
+    );
 
-    // ✅ Save/Unsave freelancers ❤️
-    const toggleSave = (id) => {
-        setSaveList((prev) =>
-            prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
-        );
-    };
-
-    // ✅ Fetch messages
-    useEffect(() => {
-        if (activeTab === "messages") {
-            const fetchMessages = async () => {
-                setLoading(true);
-                try {
-                    const res = await API.get("/api/messages");
-                    setMessages(res.data);
-                } catch (err) {
-                    console.error(err);
-                } finally {
-                    setLoading(false);
-                }
-            };
-            fetchMessages();
-        }
-    }, [activeTab]);
 
     return (
         <div className="min-h-screen bg-gray-100">
             {/* ------------------ NAVBAR ------------------ */}
-            <nav>
+            <nav className="sticky top-0 z-50">
                 <div className="flex px-4 sm:px-8 justify-between bg-gray-100 items-center py-3 sm:py-4 w-full sticky top-0 text-black border-b border-gray-200">
                     <h1 className="text-lg sm:text-xl font-bold">
                         Gig<span className="text-green-600">Connect</span>
                     </h1>
 
                     {/* SEARCH BAR */}
-                    <div className="relative border rounded w-[68vw] flex items-center justify-between">
+                    <div className="relative border rounded w-[68vw] flex items-center justify-between h-11">
                         <input
                             type="text"
                             placeholder="Search freelancers..."
@@ -179,11 +118,11 @@ const ClientDashboard = () => {
                         />
 
                         <button
-                            onClick={goSearchResults}
-                            className="px-3 py-2 bg-black rounded-r hover:bg-gray-800"
+                            className="px-3 bg-black rounded-r hover:bg-gray-800 h-full cursor-pointer flex items-center"
                         >
                             <lord-icon src="https://cdn.lordicon.com/xaekjsls.json"
-                                trigger="hover" colors="primary:#ffffff"
+                                trigger="hover"
+                                colors="primary:#ffffff"
                                 className="w-7 h-6">
                             </lord-icon>
                         </button>
@@ -205,10 +144,26 @@ const ClientDashboard = () => {
                     </div>
 
                     {/* NAV BUTTONS */}
-                    <div className="flex items-center justify-center gap-5">
-                        <button onClick={() => setActiveTab("messages")}>Messages</button>
-                        <button onClick={() => setActiveTab("savelist")}>SaveList</button>
-                        <button>Orders</button>
+                    <div className="flex gap-6">
+                        <button onClick={() => setActiveTab("notification")} className="cursor-pointer w-5 h-5">
+                            <lord-icon
+                                src="https://cdn.lordicon.com/ahxaipjb.json"
+                                colors="primary:#000000">
+                            </lord-icon>
+                        </button>
+                        <button onClick={() => setActiveTab("messages")} className="cursor-pointer w-5 h-5">
+                            <lord-icon
+                                src="https://cdn.lordicon.com/bpptgtfr.json"
+                                colors="primary:#000000">
+                            </lord-icon>
+                        </button>
+                        <button onClick={() => setActiveTab("savelist")} className="cursor-pointer w-5 h-5">
+                            <lord-icon
+                                src="https://cdn.lordicon.com/hsabxdnr.json"
+                                colors="primary:#000000">
+                            </lord-icon>
+                        </button>
+                        <button onClick={() => setActiveTab("orders")} className="hover:text-green-600 hover:underline cursor-pointer">Orders</button>
 
                         {/* ✅ Avatar dropdown */}
                         <div className="relative" ref={menuRef}>
@@ -219,7 +174,7 @@ const ClientDashboard = () => {
                             />
 
                             {menuOpen && (
-                                <div className="absolute right-0 mt-2 w-40 bg-white shadow rounded border z-50">
+                                <div className="absolute right-1 mt-4 w-52 bg-white shadow rounded border z-50">
                                     <button
                                         className="block px-4 py-2 w-full text-left hover:bg-gray-100"
                                         onClick={() => {
@@ -227,12 +182,12 @@ const ClientDashboard = () => {
                                             setMenuOpen(false);
                                         }}
                                     >
-                                       View Profile
+                                        Your Profile
                                     </button>
 
-                                    <button className="block px-4 py-2 w-full text-left hover:bg-gray-100">Post Your Gig</button>
+                                    <button className="block px-4 py-2 w-full text-left hover:bg-gray-100">Post Project Brief</button>
 
-                                    <button className="block px-4 py-2 w-full text-left hover:bg-gray-100">Your Gigs</button>
+                                    <button className="block px-4 py-2 w-full text-left hover:bg-gray-100">Your Project Briefs</button>
 
                                     <button
                                         className="block px-4 py-2 w-full text-left text-red-500 hover:bg-gray-100"
@@ -248,73 +203,141 @@ const ClientDashboard = () => {
             </nav>
 
             {/* ------------------ BODY ------------------ */}
-            <div className="p-6">
+            <div className="">
 
                 {/* DASHBOARD */}
                 {activeTab === "dashboard" && (
                     <>
-                        <h1 className="font-bold text-3xl mb-6">
-                            Welcome to Gig<span className="text-green-600">Connect</span>, {user?.name}
-                        </h1>
-
-                        <h2 className="text-2xl font-medium">
-                            Explore freelancers
-                        </h2>
-
-                        {/* ✅ Dummy Explore Cards */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
-                            {dummyFreelancers.map((freelancer) => (
-                                <div key={freelancer._id} className="bg-white p-4 rounded shadow hover:shadow-lg transition">
-                                    <img
-                                        src={freelancer.profilePic || Avtar}
-                                        className="w-16 h-16 rounded-full mb-4"
-                                    />
-                                    <h2 className="text-lg font-bold">{freelancer.name}</h2>
-                                    <p className="text-sm text-gray-600 mb-2">{freelancer.skills.join(", ")}</p>
-                                    <button className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                                        View Profile
-                                    </button>
+                        <div className="p-6 bg-linear-to-b from-green-100 to-transparent">
+                            <h1 className="font-bold text-3xl mb-4 ">
+                                Welcome to Gig<span className="text-green-600">Connect</span>, {user?.name}
+                            </h1>
+                            <div className="flex gap-5 mb-6 ml-5 ">
+                                <div className="py-2.5 px-5 rounded-2xl min-w-1/4 bg-white shadow hover:shadow-lg transition cursor-pointer">
+                                    <h1 className="text-sm font-sans font-semibold text-gray-500">RECOMMENDED FOR YOU</h1>
+                                    <div className="flex items-center gap-2">
+                                        <div className="bg-gray-200 rounded-full p-2 flex items-center"><lord-icon
+                                            src="https://cdn.lordicon.com/mubdgyyw.json"
+                                            colors="primary:#000000"
+                                            className="w-6 h-6">
+                                        </lord-icon></div>
+                                        <div>
+                                            <div className="font-semibold">Post a project brief</div>
+                                            <div className="text-gray-500">Get offers for your needs</div>
+                                        </div>
+                                    </div>
                                 </div>
-                            ))}
+                                <div className="py-2.5 px-5 rounded-2xl min-w-1/4 bg-white shadow hover:shadow-lg transition cursor-pointer">
+                                    <h1 className="text-sm font-sans font-semibold text-gray-500">PROFILE PROGRESS</h1>
+                                    <div className="flex items-center gap-2">
+                                        <div className="bg-gray-200 rounded-full p-2 flex items-center"><lord-icon
+                                            src="https://cdn.lordicon.com/qlpudrww.json"
+                                            colors="primary:#000000"
+                                            className="w-6 h-6">
+                                        </lord-icon></div>
+                                        <div>
+                                            <div className="font-semibold">Your profile is not completed</div>
+                                            <div className="text-gray-500">Complete it to get tailored suggestion</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        {loading ? (
-                            <div>Loading...</div>
-                        ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
-                                {filteredFreelancers.map((freelancer) => (
-                                    <div
-                                        key={freelancer._id}
-                                        className="bg-white p-4 rounded shadow hover:shadow-lg transition"
-                                    >
-                                        <div className="flex justify-between">
-                                            <img
-                                                src={freelancer.profilePic || Avtar}
-                                                className="w-16 h-16 rounded-full mb-4"
-                                            />
+                        <div className="p-6">
+                            <h2 className="text-2xl font-medium">
+                                Explore freelancers
+                            </h2>
 
-                                            <span
-                                                className="cursor-pointer text-xl"
-                                                onClick={() => toggleSave(freelancer._id)}
-                                            >
-                                                {saveList.includes(freelancer._id) ? "❤️" : "🤍"}
-                                            </span>
+                            <select id="categories" value={selectCategories} onChange={handleCategories} className="border border-gray-400 mt-2 p-1 rounded-md">
+                                <option value="">All Domains</option>
+                                {categories.map((categorie) => (
+                                    <option key={categorie} value={categorie}>
+                                        {categorie}
+                                    </option>
+                                ))}
+                            </select>
+
+                            {loading ? (
+                                <p>Loading gigs...</p>
+                            ) : displayedGigs.length === 0 ? (
+                                <p className="text-gray-600">No gigs found.</p>
+                            ) : (
+                                <>
+                                    {/* Mobile: vertical list (show up to 5) */}
+                                    < div className="grid grid-cols-1 gap-4 sm:hidden mt-6 px-3">
+                                        {displayedGigs.slice(0, 5).map((gig) => (
+                                            <GigCard key={gig._id} gig={gig} />
+                                        ))}
+                                    </div>
+
+                                    {/* Desktop/Tablet: horizontal scroll with Prev/Next buttons */}
+                                    <div className="hidden sm:block relative mt-6 px-3">
+                                        <div
+                                            id="gigScrollContainer"
+                                            className="flex gap-4 overflow-hidden scroll-smooth"
+                                            onScroll={(e) => {
+                                                const container = e.target;
+                                                const prevBtn = document.getElementById("prevButton");
+                                                if (container.scrollLeft > 50) {
+                                                    prevBtn.classList.remove("opacity-0", "pointer-events-none");
+                                                } else {
+                                                    prevBtn.classList.add("opacity-0", "pointer-events-none");
+                                                }
+                                            }}
+                                        >
+                                            {displayedGigs.map((gig) => (
+                                                <div key={gig._id} className="min-w-[250px] flex-shrink-0">
+                                                    <GigCard gig={gig} />
+                                                </div>
+                                            ))}
                                         </div>
 
-                                        <h2 className="text-lg font-bold">{freelancer.name}</h2>
-                                        <p className="text-sm text-gray-600">
-                                            {freelancer.skills?.join(", ")}
-                                        </p>
+                                        {/* Prev Button */}
+                                        <button
+                                            id="prevButton"
+                                            onClick={() => {
+                                                const container = document.getElementById("gigScrollContainer");
+                                                container.scrollBy({ left: -800, behavior: "smooth" });
+                                            }}
+                                            className="absolute top-1/2 left-3 -translate-y-1/2 bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition opacity-0 pointer-events-none z-10"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="w-5 h-5"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
 
-                                        <button className="mt-2 px-4 py-2 bg-green-600 text-white rounded">
-                                            View Profile
+                                        {/* Next Button */}
+                                        <button
+                                            onClick={() => {
+                                                const container = document.getElementById("gigScrollContainer");
+                                                container.scrollBy({ left: 800, behavior: "smooth" });
+                                            }}
+                                            className="absolute top-1/2 right-3 -translate-y-1/2 bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition z-10"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="w-5 h-5"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
                                         </button>
                                     </div>
-                                ))}
-                            </div>
-                        )}
-                    </>
-                )}
+                                </>
+
+                            )}
+                        </div>
+                    </>)}
+
 
                 {/* SAVED LIST */}
                 {activeTab === "savelist" && (
@@ -326,16 +349,6 @@ const ClientDashboard = () => {
                             ← Back
                         </button>
                         <h1 className="text-2xl font-bold mb-4">Saved Freelancers ❤️</h1>
-
-                        {saveList.length === 0 && <p>No saved freelancers</p>}
-
-                        {filteredFreelancers
-                            .filter(f => saveList.includes(f._id))
-                            .map((f) => (
-                                <div key={f._id} className="bg-white p-4 rounded shadow mb-3">
-                                    {f.name}
-                                </div>
-                            ))}
                     </>
                 )}
 
@@ -351,18 +364,6 @@ const ClientDashboard = () => {
 
                         <h2 className="text-xl font-bold mb-4">Messages</h2>
 
-                        {loading ? (
-                            <div>Loading...</div>
-                        ) : (
-                            messages.map((m) => (
-                                <p
-                                    key={m._id}
-                                    className="bg-white p-3 rounded shadow mb-2"
-                                >
-                                    <strong>{m.fromName}:</strong> {m.text}
-                                </p>
-                            ))
-                        )}
                     </>
                 )}
 
@@ -385,9 +386,36 @@ const ClientDashboard = () => {
                         </div>
                     </>
                 )}
+
+                {/* NOTIFICATIONS */}
+                {activeTab === "notification" && (
+                    <>
+                        <button
+                            className="mb-4 px-4 py-2 bg-gray-300 rounded"
+                            onClick={() => setActiveTab("dashboard")}
+                        >
+                            ← Back
+                        </button>
+
+                        <h2 className="text-xl font-bold mb-4">Notifications</h2>
+                    </>
+                )}
+
+                {/* ORDERS */}
+                {activeTab === "orders" && (
+                    <>
+                        <button
+                            className="mb-4 px-4 py-2 bg-gray-300 rounded"
+                            onClick={() => setActiveTab("dashboard")}
+                        >
+                            ← Back
+                        </button>
+
+                        <h2 className="text-xl font-bold mb-4">Your orders</h2>
+                    </>
+                )}
             </div>
-        </div>
+        </div >
     );
 };
-
 export default ClientDashboard;

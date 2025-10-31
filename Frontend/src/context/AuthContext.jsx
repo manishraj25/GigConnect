@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await API.get("/auth/me" , {withCredentials: true});
+        const res = await API.get("/auth/me");
         setUser(res.data.user);
       } catch (err) {
         setUser(null);
@@ -28,21 +28,21 @@ export const AuthProvider = ({ children }) => {
 
   // Login function
   const login = async (email, password) => {
-    const res = await API.post("/auth/login", { email, password, withCredentials: true });
+    const res = await API.post("/auth/login", { email, password });
     setUser(res.data.user);
     return res.data.user;
   };
 
   // Signup function
   const signup = async (formData) => {
-    const res = await API.post("/auth/register", formData, {withCredentials: true});
+    const res = await API.post("/auth/register", formData);
     setUser(res.data.user);
     return res.data.user;
   };
 
   // Logout function
   const logout = async () => {
-    await API.post("/auth/logout", {withCredentials: true});
+    await API.post("/auth/logout");
     setUser(null);
   };
 

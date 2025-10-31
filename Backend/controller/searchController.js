@@ -1,53 +1,57 @@
 import Freelancer from "../models/Freelancer.js";
+import Gigs from "../models/Gigs.js";
 import ProjectPost from "../models/ProjectPost.js";
 
-// ====================================================
-// 🔍 CLIENT SEARCH — Find Freelancers by Domain, then Filter
-// ====================================================
-
+//Search Freelancers & Return Their Gigs (for Clients)
 export const searchFreelancers = async (req, res) => {
   try {
-    const { domain, location, minPrice, maxPrice } = req.query;
+    const { searchTag, location, minPrice, maxPrice } = req.query;
 
-    // Step 1: Match freelancers by domain name
+    // Step 1: Build freelancer query
     const freelancerQuery = {};
 
-    if (domain) {
-      // domain match — any domain in array that includes the searched value
-      freelancerQuery.domains = { $regex: domain, $options: "i" };
+    if (searchTag) {
+      // Search in searchTags or skills
+      freelancerQuery.$or = [
+        { searchTags: { $regex: searchTag, $options: "i" } },
+        { skills: { $regex: searchTag, $options: "i" } },
+        { headline: { $regex: searchTag, $options: "i" } },
+      ];
     }
 
+    // Step 2: Find matching freelancers
     const freelancers = await Freelancer.find(freelancerQuery)
       .populate("user", "name email")
-      .select("_id domains location user");
+      .select("_id searchTags skills location user headline");
 
     if (!freelancers.length) {
-      return res.status(404).json({ message: "No freelancers found for this domain." });
+      return res.status(404).json({ message: "No freelancers found for this search tag." });
     }
 
-    // Step 2: Collect freelancer IDs
+    // Step 3: Collect freelancer IDs
     const freelancerIds = freelancers.map((f) => f._id);
 
-    // Step 3: Find gigs for these freelancers
+    // Step 4: Build gigs query
     const gigQuery = { freelancer: { $in: freelancerIds } };
 
     // Optional: Filter gigs by price range
     if (minPrice || maxPrice) {
-      gigQuery["price.minprice"] = {};
-      gigQuery["price.maxprice"] = {};
+      gigQuery["price.minPrice"] = {};
+      gigQuery["price.maxPrice"] = {};
 
-      if (minPrice) gigQuery["price.minprice"].$gte = Number(minPrice);
-      if (maxPrice) gigQuery["price.maxprice"].$lte = Number(maxPrice);
+      if (minPrice) gigQuery["price.minPrice"].$gte = Number(minPrice);
+      if (maxPrice) gigQuery["price.maxPrice"].$lte = Number(maxPrice);
     }
 
+    // Step 5: Get gigs for matched freelancers
     let gigs = await Gigs.find(gigQuery)
       .populate({
         path: "freelancer",
         populate: { path: "user", select: "name email" },
       })
-      .select("-__v");
+      .select("-__v -updatedAt");
 
-    // Step 4: Filter by location (if provided)
+    // Step 6: Optional location filter
     if (location) {
       gigs = gigs.filter((gig) => {
         const loc = gig.freelancer.location || {};
@@ -63,25 +67,27 @@ export const searchFreelancers = async (req, res) => {
       return res.status(404).json({ message: "No gigs found matching these filters." });
     }
 
-    // Step 5: Return results
-    res.json({
+    // Step 7: Return results
+    res.status(200).json({
+      success: true,
       totalResults: gigs.length,
       filters: {
-        domain: domain || "Any",
+        searchTag: searchTag || "Any",
         location: location || "Any",
         minPrice: minPrice || "Any",
         maxPrice: maxPrice || "Any",
       },
       gigs,
     });
+
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 };
 
-// ====================================================
-// 🔍 Search Projects (for Freelancers)
-// ====================================================
+
+//Search projects (for Freelancers)
 export const searchProjects = async (req, res) => {
   try {
     const { skills, minBudget, maxBudget, status } = req.query;

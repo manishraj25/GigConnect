@@ -2,16 +2,14 @@ import Freelancer from "../models/Freelancer.js";
 import User from "../models/User.js";
 import cloudinary from "../config/cloudinary.js";
 
-// ---------------------------------------
-// 📌 Create or Update Freelancer Profile
-// ---------------------------------------
+//create or update freelancer profile
 export const upsertFreelancerProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { skills, headline, domains, about, location, portfolio } = req.body;
+    const { skills, headline, searchTags, about, location, portfolio } = req.body;
     let profileImage = {};
 
-    // ✅ Upload new profile image if provided
+    //Upload new profile image if provided
     if (req.file) {
       const upload = await cloudinary.uploader.upload(req.file.path, {
         folder: "freelancer_profiles",
@@ -22,14 +20,14 @@ export const upsertFreelancerProfile = async (req, res) => {
     const existingFreelancer = await Freelancer.findOne({ user: userId });
 
     if (existingFreelancer) {
-      // ✅ Update existing profile
+      //Update existing profile
       if (profileImage.url && existingFreelancer.profileImage.public_id) {
         await cloudinary.uploader.destroy(existingFreelancer.profileImage.public_id);
       }
 
       existingFreelancer.skills = skills || existingFreelancer.skills;
       existingFreelancer.headline = headline || existingFreelancer.headline;
-      existingFreelancer.domains = domains || existingFreelancer.domains;
+      existingFreelancer.searchTags = searchTags || existingFreelancer.searchTags;
       existingFreelancer.about = about || existingFreelancer.about;
       existingFreelancer.location = location || existingFreelancer.location;
       existingFreelancer.profileImage = profileImage.url
@@ -43,12 +41,12 @@ export const upsertFreelancerProfile = async (req, res) => {
       });
     }
 
-    // ✅ Create new profile
+    //Create new profile
     const newFreelancer = await Freelancer.create({
       user: userId,
       skills,
       headline,
-      domains,
+      searchTags,
       about,
       location,
       profileImage,
@@ -63,9 +61,7 @@ export const upsertFreelancerProfile = async (req, res) => {
   }
 };
 
-// ---------------------------------------
-// 📌 Upload Portfolio Project (with multiple photos)
-// ---------------------------------------
+//upload portfolio item
 export const addPortfolioItem = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -77,7 +73,7 @@ export const addPortfolioItem = async (req, res) => {
 
     let photos = [];
 
-    // ✅ Handle multiple portfolio images
+    //Handle multiple portfolio images
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         const upload = await cloudinary.uploader.upload(file.path, {
@@ -104,9 +100,7 @@ export const addPortfolioItem = async (req, res) => {
   }
 };
 
-// ---------------------------------------
-// 📌 Get My Profile (Freelancer Dashboard)
-// ---------------------------------------
+//Get my freelancer profile
 export const getMyProfile = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -124,9 +118,7 @@ export const getMyProfile = async (req, res) => {
   }
 };
 
-// ---------------------------------------
-// 📌 Update Basic User Info (User model)
-// ---------------------------------------
+//Update user info (name, email, password)
 export const updateUserInfo = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -137,7 +129,7 @@ export const updateUserInfo = async (req, res) => {
 
     if (name) user.name = name;
     if (email) user.email = email;
-    if (password) user.password = password; // hashed automatically if hook exists
+    if (password) user.password = password; 
 
     await user.save();
     res.json({ message: "User info updated successfully", user });
@@ -146,9 +138,7 @@ export const updateUserInfo = async (req, res) => {
   }
 };
 
-// ---------------------------------------
-// 📌 Delete Freelancer Profile
-// ---------------------------------------
+// Delete freelancer profile
 export const deleteFreelancerProfile = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -175,9 +165,7 @@ export const deleteFreelancerProfile = async (req, res) => {
   }
 };
 
-// ---------------------------------------
-// 📌 Public API – Get Freelancer Profile
-// ---------------------------------------
+//Get freelancer profile by ID
 export const getFreelancerById = async (req, res) => {
   try {
     const freelancer = await Freelancer.findById(req.params.id)

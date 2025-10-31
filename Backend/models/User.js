@@ -12,5 +12,5 @@ const userSchema = new mongoose.Schema({
   resetPasswordOtpExpiry: { type: Number, default: 0}
 }, { timestamps: true });
 
-const User = mongoose.model.user || mongoose.model('user', userSchema);
+const User = mongoose.model.User || mongoose.model('User', userSchema);
 export default User;

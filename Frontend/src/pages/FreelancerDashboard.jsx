@@ -1,37 +1,47 @@
-// ClientDashboard.jsx
 import React, { useContext, useEffect, useState, useRef } from "react";
 import { AuthContext, useAuth } from "../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
-import API from "../api/api.js";
+import API from "../api/api.js"
 import Avtar from "../assets/profile.png";
 
-const ClientDashboard = () => {
+const freelancerDashboard = () => {
     const { user } = useContext(AuthContext);
     const [activeTab, setActiveTab] = useState("dashboard");
-    const [freelancers, setFreelancers] = useState([]);
-    const [filteredFreelancers, setFilteredFreelancers] = useState([]);
-    const [messages, setMessages] = useState([]);
     const [search, setSearch] = useState("");
-    const [loading, setLoading] = useState(false);
     const { logout } = useAuth();
     const [menuOpen, setMenuOpen] = useState(false);
 
-    // NEW States 🌟
+    const [selectCategories, setSelectCategories] = useState("");
     const [suggestions, setSuggestions] = useState([]);
-    const [saveList, setSaveList] = useState([]);
-    const [page, setPage] = useState(1);
 
-    const navigate = useNavigate();
+
     const menuRef = useRef(null);
+    const navigate = useNavigate();
+
 
     const categories = [
-        "Web Developer", "UI/UX Designer", "Logo Designer",
-        "Mobile Developer", "Video Editor", "Full Stack Developer",
-        "Backend Developer"
+        "Web Developer",
+        "UI/UX Designer",
+        "Logo Designer",
+        "Mobile Developer",
+        "Video Editor",
+        "Full Stack Developer",
+        "Backend Developer",
     ];
 
+    //Fetch all gigs
+    useEffect(() => {
 
-    // ✅ Close profile menu when clicking outside
+        if (activeTab === "dashboard");
+    }, [activeTab]);
+
+    //Handle category change
+    const handleCategories = (event) => {
+        setSelectCategories(event.target.value);
+    };
+
+
+    // Close profile menu when clicking outside
     useEffect(() => {
         const handler = (e) => {
             if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -42,95 +52,30 @@ const ClientDashboard = () => {
         return () => document.removeEventListener("mousedown", handler);
     }, []);
 
-    // ✅ Fetch freelancers
-    useEffect(() => {
-        if (activeTab === "dashboard") {
-            const fetchFreelancers = async () => {
-                setLoading(true);
-                try {
-                    const res = await API.get(`/api/freelancers?page=${page}`);
-                    if (page === 1) {
-                        setFreelancers(res.data);
-                        setFilteredFreelancers(res.data);
-                    } else {
-                        setFreelancers((p) => [...p, ...res.data]);
-                        setFilteredFreelancers((p) => [...p, ...res.data]);
-                    }
-                } catch (err) {
-                    console.error(err);
-                } finally {
-                    setLoading(false);
-                }
-            };
-            fetchFreelancers();
-        }
-    }, [activeTab, page]);
 
-    // ✅ Infinite scroll trigger
-    useEffect(() => {
-        const onScroll = () => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 3) {
-                setPage((prev) => prev + 1);
-            }
-        };
-        window.addEventListener("scroll", onScroll);
-        return () => window.removeEventListener("scroll", onScroll);
-    }, []);
 
-    // ✅ Suggestions while typing
+
+    //Suggestions while typing
     const handleTyping = (e) => {
         const text = e.target.value;
         setSearch(text);
 
         if (!text) return setSuggestions([]);
 
-        const filtered = categories.filter(c =>
+        const filtered = categories.filter((c) =>
             c.toLowerCase().includes(text.toLowerCase())
         );
-
-        const names = freelancers
-            .map(f => f.name)
-            .filter(n => n.toLowerCase().includes(text.toLowerCase()));
-
-        setSuggestions([...filtered, ...names]);
+        setSuggestions(filtered);
     };
 
-    // ✅ Click suggestion
+    //Click suggestion
     const applySuggestion = (value) => {
         setSearch(value);
         setSuggestions([]);
     };
 
-    // ✅ Go to search result page
-    const goSearchResults = () => {
-        if (!search.trim()) return;
-        navigate(`/search?query=${search}`);
-    };
 
-    // ✅ Save/Unsave freelancers ❤️
-    const toggleSave = (id) => {
-        setSaveList((prev) =>
-            prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
-        );
-    };
 
-    // ✅ Fetch messages
-    useEffect(() => {
-        if (activeTab === "messages") {
-            const fetchMessages = async () => {
-                setLoading(true);
-                try {
-                    const res = await API.get("/api/messages");
-                    setMessages(res.data);
-                } catch (err) {
-                    console.error(err);
-                } finally {
-                    setLoading(false);
-                }
-            };
-            fetchMessages();
-        }
-    }, [activeTab]);
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -142,21 +87,21 @@ const ClientDashboard = () => {
                     </h1>
 
                     {/* SEARCH BAR */}
-                    <div className="relative border rounded w-[68vw] flex items-center justify-between">
+                    <div className="relative border rounded w-[68vw] flex items-center justify-between h-11">
                         <input
                             type="text"
-                            placeholder="Search Projects..."
+                            placeholder="Search freelancers..."
                             className="px-4 outline-none w-full py-2 rounded-l"
                             value={search}
                             onChange={handleTyping}
                         />
 
                         <button
-                            onClick={goSearchResults}
-                            className="px-3 py-2 bg-black rounded-r hover:bg-gray-800"
+                            className="px-3 bg-black rounded-r hover:bg-gray-800 h-full cursor-pointer flex items-center"
                         >
                             <lord-icon src="https://cdn.lordicon.com/xaekjsls.json"
-                                trigger="hover" colors="primary:#ffffff"
+                                trigger="hover"
+                                colors="primary:#ffffff"
                                 className="w-7 h-6">
                             </lord-icon>
                         </button>
@@ -178,10 +123,26 @@ const ClientDashboard = () => {
                     </div>
 
                     {/* NAV BUTTONS */}
-                    <div className="flex items-center justify-center gap-5">
-                        <button onClick={() => setActiveTab("messages")}>Messages</button>
-                        <button onClick={() => setActiveTab("savelist")}>SaveList</button>
-                        <button>Orders</button>
+                    <div className="flex gap-6">
+                        <button onClick={() => setActiveTab("notification")} className="cursor-pointer w-5 h-5">
+                            <lord-icon
+                                src="https://cdn.lordicon.com/ahxaipjb.json"
+                                colors="primary:#000000">
+                            </lord-icon>
+                        </button>
+                        <button onClick={() => setActiveTab("messages")} className="cursor-pointer w-5 h-5">
+                            <lord-icon
+                                src="https://cdn.lordicon.com/bpptgtfr.json"
+                                colors="primary:#000000">
+                            </lord-icon>
+                        </button>
+                        <button onClick={() => setActiveTab("savelist")} className="cursor-pointer w-5 h-5">
+                            <lord-icon
+                                src="https://cdn.lordicon.com/hsabxdnr.json"
+                                colors="primary:#000000">
+                            </lord-icon>
+                        </button>
+                        <button onClick={() => setActiveTab("orders")} className="hover:text-green-600 hover:underline cursor-pointer">Orders</button>
 
                         {/* ✅ Avatar dropdown */}
                         <div className="relative" ref={menuRef}>
@@ -192,7 +153,7 @@ const ClientDashboard = () => {
                             />
 
                             {menuOpen && (
-                                <div className="absolute right-0 mt-2 w-40 bg-white shadow rounded border z-50">
+                                <div className="absolute right-1 mt-4 w-52 bg-white shadow rounded border z-50">
                                     <button
                                         className="block px-4 py-2 w-full text-left hover:bg-gray-100"
                                         onClick={() => {
@@ -200,12 +161,12 @@ const ClientDashboard = () => {
                                             setMenuOpen(false);
                                         }}
                                     >
-                                       View Profile
+                                        Your Profile
                                     </button>
 
-                                    <button className="block px-4 py-2 w-full text-left hover:bg-gray-100">Post Your Gig</button>
+                                    <button className="block px-4 py-2 w-full text-left hover:bg-gray-100">Post Project Brief</button>
 
-                                    <button className="block px-4 py-2 w-full text-left hover:bg-gray-100">Your Gigs</button>
+                                    <button className="block px-4 py-2 w-full text-left hover:bg-gray-100">Your Project Briefs</button>
 
                                     <button
                                         className="block px-4 py-2 w-full text-left text-red-500 hover:bg-gray-100"
@@ -221,17 +182,52 @@ const ClientDashboard = () => {
             </nav>
 
             {/* ------------------ BODY ------------------ */}
-            <div className="p-6">
+            <div className="">
 
                 {/* DASHBOARD */}
                 {activeTab === "dashboard" && (
                     <>
-                        <h1 className="font-bold text-3xl mb-6">
-                            Welcome to Gig<span className="text-green-600">Connect</span>, {user?.name}
-                        </h1>
+                        <div className="p-6 bg-linear-to-b from-green-100 to-transparent">
+                            <h1 className="font-bold text-3xl mb-4 ">
+                                Welcome to Gig<span className="text-green-600">Connect</span>, {user?.name}
+                            </h1>
+                            <div className="flex gap-5 mb-6 ml-5 ">
+                                <div className="py-2.5 px-5 rounded-2xl min-w-1/4 bg-white shadow hover:shadow-lg transition cursor-pointer">
+                                    <h1 className="text-sm font-sans font-semibold text-gray-500">RECOMMENDED FOR YOU</h1>
+                                    <div className="flex items-center gap-2">
+                                        <div className="bg-gray-200 rounded-full p-2 flex items-center"><lord-icon
+                                            src="https://cdn.lordicon.com/mubdgyyw.json"
+                                            colors="primary:#000000"
+                                            className="w-6 h-6">
+                                        </lord-icon></div>
+                                        <div>
+                                            <div className="font-semibold">Post a project brief</div>
+                                            <div className="text-gray-500">Get offers for your needs</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="py-2.5 px-5 rounded-2xl min-w-1/4 bg-white shadow hover:shadow-lg transition cursor-pointer">
+                                    <h1 className="text-sm font-sans font-semibold text-gray-500">PROFILE PROGRESS</h1>
+                                    <div className="flex items-center gap-2">
+                                        <div className="bg-gray-200 rounded-full p-2 flex items-center"><lord-icon
+                                            src="https://cdn.lordicon.com/qlpudrww.json"
+                                            colors="primary:#000000"
+                                            className="w-6 h-6">
+                                        </lord-icon></div>
+                                        <div>
+                                            <div className="font-semibold">Your profile is not completed</div>
+                                            <div className="text-gray-500">Complete it to get tailored suggestion</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                    </>
-                )}
+                        <div className="p-6">
+
+                        </div>
+                    </>)}
+
 
                 {/* SAVED LIST */}
                 {activeTab === "savelist" && (
@@ -243,16 +239,6 @@ const ClientDashboard = () => {
                             ← Back
                         </button>
                         <h1 className="text-2xl font-bold mb-4">Saved Freelancers ❤️</h1>
-
-                        {saveList.length === 0 && <p>No saved freelancers</p>}
-
-                        {filteredFreelancers
-                            .filter(f => saveList.includes(f._id))
-                            .map((f) => (
-                                <div key={f._id} className="bg-white p-4 rounded shadow mb-3">
-                                    {f.name}
-                                </div>
-                            ))}
                     </>
                 )}
 
@@ -268,18 +254,6 @@ const ClientDashboard = () => {
 
                         <h2 className="text-xl font-bold mb-4">Messages</h2>
 
-                        {loading ? (
-                            <div>Loading...</div>
-                        ) : (
-                            messages.map((m) => (
-                                <p
-                                    key={m._id}
-                                    className="bg-white p-3 rounded shadow mb-2"
-                                >
-                                    <strong>{m.fromName}:</strong> {m.text}
-                                </p>
-                            ))
-                        )}
                     </>
                 )}
 
@@ -293,7 +267,7 @@ const ClientDashboard = () => {
                             ← Back
                         </button>
 
-                        <h2 className="text-xl font-bold mb-4">Freelancer Profile</h2>
+                        <h2 className="text-xl font-bold mb-4">Client Profile</h2>
 
                         <div className="bg-white p-6 rounded shadow">
                             <p><strong>Name:</strong> {user?.name}</p>
@@ -302,9 +276,36 @@ const ClientDashboard = () => {
                         </div>
                     </>
                 )}
+
+                {/* NOTIFICATIONS */}
+                {activeTab === "notification" && (
+                    <>
+                        <button
+                            className="mb-4 px-4 py-2 bg-gray-300 rounded"
+                            onClick={() => setActiveTab("dashboard")}
+                        >
+                            ← Back
+                        </button>
+
+                        <h2 className="text-xl font-bold mb-4">Notifications</h2>
+                    </>
+                )}
+
+                {/* ORDERS */}
+                {activeTab === "orders" && (
+                    <>
+                        <button
+                            className="mb-4 px-4 py-2 bg-gray-300 rounded"
+                            onClick={() => setActiveTab("dashboard")}
+                        >
+                            ← Back
+                        </button>
+
+                        <h2 className="text-xl font-bold mb-4">Your orders</h2>
+                    </>
+                )}
             </div>
         </div>
     );
 };
-
-export default ClientDashboard;
+export default freelancerDashboard;

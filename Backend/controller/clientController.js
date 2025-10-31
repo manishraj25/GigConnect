@@ -2,16 +2,15 @@ import Client from "../models/Client.js";
 import User from "../models/User.js";
 import cloudinary from "../config/cloudinary.js"; // ✅ using your existing config
 
-// ----------------------
-// 📌 Create or Update Client Profile
-// ----------------------
+
+//create or update client profile
 export const upsertClientProfile = async (req, res) => {
   try {
     const userId = req.user.id;
     const { companyName, location } = req.body;
     let profileImage = {};
 
-    // ✅ Handle image upload if provided
+    //Handle image upload if provided
     if (req.file) {
       const upload = await cloudinary.uploader.upload(req.file.path, {
         folder: "client_profiles",
@@ -22,7 +21,7 @@ export const upsertClientProfile = async (req, res) => {
     const existingClient = await Client.findOne({ user: userId });
 
     if (existingClient) {
-      // ✅ Update existing client profile
+      //Update existing client profile
       if (profileImage.url && existingClient.profileImage.public_id) {
         await cloudinary.uploader.destroy(existingClient.profileImage.public_id);
       }
@@ -35,7 +34,7 @@ export const upsertClientProfile = async (req, res) => {
       return res.json({ message: "Profile updated successfully", client: existingClient });
     }
 
-    // ✅ Create new client profile
+    //Create new client profile
     const client = await Client.create({
       user: userId,
       companyName,
@@ -49,9 +48,7 @@ export const upsertClientProfile = async (req, res) => {
   }
 };
 
-// ----------------------
-// 📌 Get My Profile (Client Dashboard)
-// ----------------------
+//Get my client profile
 export const getMyProfile = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -65,9 +62,7 @@ export const getMyProfile = async (req, res) => {
   }
 };
 
-// ----------------------
-// 📌 Update User Info (name, email, password)
-// ----------------------
+//Update user info (name, email, password)
 export const updateUserInfo = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -78,7 +73,7 @@ export const updateUserInfo = async (req, res) => {
 
     if (name) user.name = name;
     if (email) user.email = email;
-    if (password) user.password = password; // should be hashed automatically (if pre-save hook exists)
+    if (password) user.password = password;
 
     await user.save();
     res.json({ message: "User info updated", user });
@@ -87,9 +82,7 @@ export const updateUserInfo = async (req, res) => {
   }
 };
 
-// ----------------------
-// 📌 Delete Client Profile
-// ----------------------
+// Delete client profile
 export const deleteClientProfile = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -107,9 +100,7 @@ export const deleteClientProfile = async (req, res) => {
   }
 };
 
-// ----------------------
-// 📌 Public API – View Client Profile (Freelancers can access)
-// ----------------------
+//Get client profile by ID
 export const getClientById = async (req, res) => {
   try {
     const client = await Client.findById(req.params.id)

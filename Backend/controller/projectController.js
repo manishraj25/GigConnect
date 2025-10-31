@@ -1,6 +1,6 @@
 import ProjectPost from "../models/ProjectPost.js";
 
-// ✅ Create project
+//Create project
 export const createProject = async (req, res) => {
   try {
     const { title, description, skillsRequired, budget, deadline } = req.body;
@@ -19,9 +19,7 @@ export const createProject = async (req, res) => {
   }
 };
 
-// ====================================================
-// 📌 Get All Projects (Full client details)
-// ====================================================
+//Get all projects
 export const getAllProjects = async (req, res) => {
   try {
     const projects = await ProjectPost.find()
@@ -45,9 +43,7 @@ export const getAllProjects = async (req, res) => {
   }
 };
 
-// ====================================================
-// 📌 Get Single Project by ID (Full details)
-// ====================================================
+//Get project by ID
 export const getProjectById = async (req, res) => {
   try {
     const project = await ProjectPost.findById(req.params.id)
@@ -70,7 +66,7 @@ export const getProjectById = async (req, res) => {
   }
 };
 
-// ✅ Update project (client only)
+//update project(client only)
 export const updateProject = async (req, res) => {
   try {
     const project = await ProjectPost.findById(req.params.id);
@@ -86,7 +82,7 @@ export const updateProject = async (req, res) => {
   }
 };
 
-// ✅ Delete project (client only)
+//Delete project (client only)
 export const deleteProject = async (req, res) => {
   try {
     const project = await ProjectPost.findById(req.params.id);

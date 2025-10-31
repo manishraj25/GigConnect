@@ -1,34 +1,40 @@
 import React, { useState } from "react";
+import img1 from "../assets/h1.jpeg";
+import img2 from "../assets/h2.jpeg";
+import img3 from "../assets/h3.jpeg";
+import img4 from "../assets/f1.jpeg";
+import img5 from "../assets/f2.jpg";
+import img6 from "../assets/f3.jpg";
 
 const HowItWorks = () => {
   const [mode, setMode] = useState("hiring"); // "hiring" or "freelancer"
 
   const hiringSteps = [
     {
-      img: "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+      img: img1,
       title: "Posting jobs is always free",
     },
     {
-      img: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf",
+      img: img2,
       title: "Get proposals and hire",
     },
     {
-      img: "https://images.unsplash.com/photo-1553877522-43269d4ea984",
+      img: img3,
       title: "Pay when work is done",
     },
   ];
 
   const freelancerSteps = [
     {
-      img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f",
+      img: img4,
       title: "Find clients and remote jobs",
     },
     {
-      img: "https://images.unsplash.com/photo-1603570419875-7c01c4b9cfb4",
+      img: img5,
       title: "Submit proposals and get hired",
     },
     {
-      img: "https://images.unsplash.com/photo-1592496001020-5c3bffb67c57",
+      img: img6,
       title: "Get paid as you deliver work",
     },
   ];
@@ -66,7 +72,7 @@ const HowItWorks = () => {
           </div>
         </div>
 
-        {/* Cards */}
+        
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {steps.map((step, index) => (
             <div

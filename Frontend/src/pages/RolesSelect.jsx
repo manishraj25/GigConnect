@@ -13,7 +13,7 @@ const handleContinue = () => {
 
   return (
     <div className="flex flex-col items-center pt-20 min-h-[92vh] bg-gray-100 px-4">
-      {/* Title */}
+      
       <h1 className="text-2xl sm:text-3xl font-semibold mb-10 text-center">
         Join as a client or freelancer
       </h1>
@@ -78,7 +78,7 @@ const handleContinue = () => {
         </div>
       </div>
 
-      {/* Create Account Button */}
+      
       <button
         onClick={handleContinue}
         disabled={!selectedRole}

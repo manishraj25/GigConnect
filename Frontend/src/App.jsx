@@ -8,6 +8,7 @@ import HomeNavbar from "./components/HomeNavbar";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import ClientDashboard from "./pages/ClientDashboard.jsx";
 import FreelancerDashboard from "./pages/FreelancerDashboard.jsx";
+import Footer from "./components/Footer.jsx";
 
 function App() {
   const location = useLocation();
@@ -50,6 +51,7 @@ function App() {
           }
         />
       </Routes>
+      <Footer />
     </>
   );
 }
