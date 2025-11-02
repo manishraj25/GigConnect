@@ -1,25 +1,25 @@
 import mongoose from 'mongoose';
 
 const freelancerSchema = new mongoose.Schema({
-  user: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', 
-    required: true, 
-    unique: true 
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    unique: true
   },
 
   profileImage: {
     url: { type: String, default: "" },
     public_id: { type: String, default: "" }
   },
-  
+
   skills: { type: [String], default: [] },
 
-  headline: { type: String, default: "" }, // Freelancer headline
+  headline: { type: String, default: "" },
 
   searchTags: { type: [String], default: [] },
 
-  about: { type: String, default: "" }, // Freelancer about section
+  about: { type: String, default: "" },
 
   portfolio: [
     {
@@ -39,7 +39,11 @@ const freelancerSchema = new mongoose.Schema({
     city: String,
     state: String,
     country: String
-  }
+  },
+
+  averageRating: { type: Number, default: 0 },
+  totalReviews: { type: Number, default: 0 }
+
 
 }, { timestamps: true });
 

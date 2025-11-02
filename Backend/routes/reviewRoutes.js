@@ -1,22 +1,20 @@
 import express from "express";
 import {
-  createReview,
-  getReviewsForGig,
-  updateReview,
-  deleteReview
+  addReview,
+  getFreelancerReviews,
+  deleteReview,
 } from "../controller/reviewController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 
 const reviewRouter = express.Router();
 
-// Get all reviews for a gig
-reviewRouter.get("/:gigId", getReviewsForGig);
+// POST → same API for profile or gig review
+reviewRouter.post("/", authMiddleware, addReview);
 
-// Add a new review (client)
-reviewRouter.post("/:gigId", authMiddleware, createReview);
+// GET → show all reviews for a freelancer
+reviewRouter.get("/freelancer/:freelancerId", getFreelancerReviews);
 
-// Update or delete review (only reviewer)
-reviewRouter.put("/:reviewId", authMiddleware, updateReview);
-reviewRouter.delete("/:reviewId", authMiddleware, deleteReview);
+// DELETE → remove a review (client only)
+reviewRouter.delete("/:id", authMiddleware, deleteReview);
 
 export default reviewRouter;

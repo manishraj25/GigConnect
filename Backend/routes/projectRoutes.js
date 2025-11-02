@@ -4,16 +4,19 @@ import {
   getAllProjects,
   getProjectById,
   updateProject,
-  deleteProject
+  deleteProject,
+  getClientProjects
 } from "../controller/projectController.js";
-import { protect } from "../middleware/authMiddleware.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
-const router = express.Router();
+const projectRouter = express.Router();
 
-router.get("/", getAllProjects);
-router.get("/:id", getProjectById);
-router.post("/", protect, createProject);
-router.put("/:id", protect, updateProject);
-router.delete("/:id", protect, deleteProject);
+projectRouter.get("/", getAllProjects);
+projectRouter.get("/:id", getProjectById);
 
-export default router;
+projectRouter.get("/client", authMiddleware, getClientProjects);
+projectRouter.post("/", authMiddleware, createProject);
+projectRouter.put("/:id", authMiddleware, updateProject);
+projectRouter.delete("/:id", authMiddleware, deleteProject);
+
+export default projectRouter;

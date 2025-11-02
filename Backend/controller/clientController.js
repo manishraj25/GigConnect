@@ -1,6 +1,6 @@
 import Client from "../models/Client.js";
 import User from "../models/User.js";
-import cloudinary from "../config/cloudinary.js"; // ✅ using your existing config
+import cloudinary from "../config/cloudinary.js";
 
 
 //create or update client profile
