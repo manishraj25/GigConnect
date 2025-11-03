@@ -15,6 +15,7 @@ import searchRouter from './routes/searchRoutes.js';
 import projectRouter from './routes/projectRoutes.js';
 import reviewRouter from './routes/reviewRoutes.js';
 import messageRouter from './routes/messageRoutes.js';
+import paymentRouter from './routes/paymentRoutes.js';
 
 // Models
 import Message from './models/Message.js';
@@ -43,6 +44,7 @@ app.use('/api/reviews', reviewRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/projects', projectRouter);
 app.use("/api/messages", messageRouter);
+app.use('/api/payments',paymentRouter)
 
 //Create HTTP server for Socket.IO
 const server = http.createServer(app);

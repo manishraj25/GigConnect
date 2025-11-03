@@ -5,7 +5,7 @@ import User from "../models/User.js";
 export const sendMessage = async (req, res) => {
   try {
     const { to, content } = req.body;
-    const from = req.user._id;
+    const from = req.user.id;
 
     if (!to || !content)
       return res.status(400).json({ message: "Recipient and content are required" });
@@ -28,7 +28,7 @@ export const sendMessage = async (req, res) => {
 //Get full conversation between two users
 export const getConversation = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user.id;
     const { otherUserId } = req.params;
 
     const messages = await Message.find({
@@ -52,7 +52,7 @@ export const getConversation = async (req, res) => {
 //Mark messages as read (and return count)
 export const markAsRead = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user.id;
     const { from } = req.body;
 
     const result = await Message.updateMany(
@@ -69,7 +69,7 @@ export const markAsRead = async (req, res) => {
 //Get chat summaries (last message + unread count)
 export const getChatsSummary = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user.id;
 
     // All messages where user is sender or receiver
     const messages = await Message.find({
@@ -85,7 +85,7 @@ export const getChatsSummary = async (req, res) => {
 
     for (const msg of messages) {
       const otherUser =
-        msg.from._id.toString() === userId.toString() ? msg.to : msg.from;
+        msg.from.id.toString() === userId.toString() ? msg.to : msg.from;
       const otherId = otherUser._id.toString();
 
       if (!chats[otherId]) {
@@ -97,7 +97,7 @@ export const getChatsSummary = async (req, res) => {
       }
 
       // Count unread messages where current user is the recipient
-      if (msg.to._id.toString() === userId.toString() && !msg.read) {
+      if (msg.to.id.toString() === userId.toString() && !msg.read) {
         chats[otherId].unreadCount++;
       }
     }

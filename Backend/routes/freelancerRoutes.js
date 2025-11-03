@@ -6,6 +6,8 @@ import {
   updateUserInfo,
   deleteFreelancerProfile,
   getFreelancerById,
+  updateBankDetails,
+  getBankDetails
 } from "../controller/freelancerController.js";
 
 import authMiddleware  from "../middleware/authMiddleware.js";
@@ -33,16 +35,19 @@ freelancerRouter.put("/update-user", authMiddleware, updateUserInfo);
 freelancerRouter.post(
   "/portfolio",
   authMiddleware,
-  upload.array("portfolioImages", 5), // up to 5 images per portfolio item
+  upload.array("portfolioImages", 5),
   addPortfolioItem
 );
 
 //Delete Freelancer Profile
 freelancerRouter.delete("/delete", authMiddleware, deleteFreelancerProfile);
 
-
-
 //Get Freelancer Profile by ID (public)
 freelancerRouter.get("/:id", getFreelancerById);
+
+
+//Bank details routes
+freelancerRouter.put("/bank-details", authMiddleware, updateBankDetails);
+freelancerRouter.get("/bank-details", authMiddleware, getBankDetails);
 
 export default freelancerRouter;

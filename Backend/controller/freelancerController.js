@@ -180,3 +180,53 @@ export const getFreelancerById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+//Save or update freelancer bank details
+export const updateBankDetails = async (req, res) => {
+  try {
+    const { accountHolderName, accountNumber, ifsc, bankName } = req.body;
+
+    const freelancer = await Freelancer.findOneAndUpdate(
+      { user: req.user.id },
+      {
+        $set: {
+          "bankDetails.accountHolderName": accountHolderName,
+          "bankDetails.accountNumber": accountNumber,
+          "bankDetails.ifsc": ifsc,
+          "bankDetails.bankName": bankName,
+        },
+      },
+      { new: true }
+    );
+
+    if (!freelancer) {
+      return res.status(404).json({ message: "Freelancer not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bank details updated successfully",
+      bankDetails: freelancer.bankDetails,
+    });
+  } catch (error) {
+    console.error("Error updating bank details:", error);
+    res.status(500).json({ message: "Failed to update bank details" });
+  }
+};
+
+// Get freelancer bank details
+export const getBankDetails = async (req, res) => {
+  try {
+    const freelancer = await Freelancer.findOne({ user: req.user.id }).select("bankDetails");
+
+    if (!freelancer) {
+      return res.status(404).json({ message: "Freelancer not found" });
+    }
+
+    res.status(200).json({ success: true, bankDetails: freelancer.bankDetails });
+  } catch (error) {
+    console.error("Error fetching bank details:", error);
+    res.status(500).json({ message: "Failed to fetch bank details" });
+  }
+};

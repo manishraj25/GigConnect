@@ -29,7 +29,7 @@ const updateFreelancerRating = async (freelancerId) => {
 export const addReview = async (req, res) => {
   try {
     const { freelancerId, gigId, rating, comment } = req.body;
-    const reviewerId = req.user._id; // from authMiddleware
+    const reviewerId = req.user.id; // from authMiddleware
 
     // Validate freelancer
     const freelancer = await Freelancer.findById(freelancerId);
@@ -100,7 +100,7 @@ export const deleteReview = async (req, res) => {
     const review = await Review.findById(id);
     if (!review) return res.status(404).json({ message: "Review not found" });
 
-    if (review.reviewer.toString() !== req.user._id.toString()) {
+    if (review.reviewer.toString() !== req.user.id.toString()) {
       return res.status(403).json({ message: "Not authorized to delete this review" });
     }
 

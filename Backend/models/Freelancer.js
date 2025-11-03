@@ -41,6 +41,13 @@ const freelancerSchema = new mongoose.Schema({
     country: String
   },
 
+  bankDetails: {
+    accountHolderName: { type: String },
+    accountNumber: { type: String },
+    ifsc: { type: String },
+    bankName: { type: String },
+  },
+
   averageRating: { type: Number, default: 0 },
   totalReviews: { type: Number, default: 0 }
 
