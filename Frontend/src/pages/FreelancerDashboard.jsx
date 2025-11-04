@@ -1,23 +1,50 @@
 import React, { useContext, useEffect, useState, useRef } from "react";
 import { AuthContext, useAuth } from "../context/AuthContext.jsx";
-import { useNavigate } from "react-router-dom";
-import API from "../api/api.js"
+import API from "../api/api.js";
 import Avtar from "../assets/profile.png";
+import ProjectCard from "../components/ProjectCard.jsx";
+import { ChevronDown } from "lucide-react";
 
-const freelancerDashboard = () => {
+
+const faqs = [
+    {
+        question: "What can I sell?",
+        answer: "You can sell any digital service you’re skilled at — web development, design, writing, marketing, etc.",
+    },
+    {
+        question: "How much time will I need to invest?",
+        answer: "You can work as much or as little as you like. It’s completely flexible and depends on your availability.",
+    },
+    {
+        question: "How much money can I make?",
+        answer: "Your earnings depend on your skills, demand, and time commitment. Many freelancers earn part-time or even full-time income.",
+    },
+    {
+        question: "How do I price my service?",
+        answer: "Set your price based on project complexity, market rate, and your experience. You can always adjust later.",
+    },
+    {
+        question: "How much does it cost?",
+        answer: "Creating an account is free. Platform fees apply only when you complete a job or sell a service.",
+    },
+    {
+        question: "How do I get paid?",
+        answer: "Payments are securely processed and transferred to your linked account after project completion.",
+    },
+];
+
+const FreelancerDashboard = () => {
     const { user } = useContext(AuthContext);
     const [activeTab, setActiveTab] = useState("dashboard");
     const [search, setSearch] = useState("");
     const { logout } = useAuth();
     const [menuOpen, setMenuOpen] = useState(false);
-
-    const [selectCategories, setSelectCategories] = useState("");
     const [suggestions, setSuggestions] = useState([]);
-
+    const [openIndex, setOpenIndex] = useState(null);
+    const [projects, setProjects] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const menuRef = useRef(null);
-    const navigate = useNavigate();
-
 
     const categories = [
         "Web Developer",
@@ -29,19 +56,25 @@ const freelancerDashboard = () => {
         "Backend Developer",
     ];
 
-    //Fetch all gigs
     useEffect(() => {
+        const fetchProjects = async () => {
+            setLoading(true);
+            try {
+                const res = await API.get("/projects");
+                setProjects(res.data.projects);
+            } catch (err) {
+                console.error("Error fetching projects:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-        if (activeTab === "dashboard");
+        if (activeTab === "dashboard") {
+            fetchProjects();
+        }
     }, [activeTab]);
 
-    //Handle category change
-    const handleCategories = (event) => {
-        setSelectCategories(event.target.value);
-    };
-
-
-    // Close profile menu when clicking outside
+    // close profile menu when clicking outside
     useEffect(() => {
         const handler = (e) => {
             if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -106,7 +139,7 @@ const freelancerDashboard = () => {
                             </lord-icon>
                         </button>
 
-                        {/* ✅ Auto suggestions dropdown */}
+                        {/*Auto suggestions dropdown */}
                         {suggestions.length > 0 && (
                             <div className="absolute top-10 bg-white w-full shadow-lg rounded z-50">
                                 {suggestions.map((s, idx) => (
@@ -144,7 +177,7 @@ const freelancerDashboard = () => {
                         </button>
                         <button onClick={() => setActiveTab("orders")} className="hover:text-green-600 hover:underline cursor-pointer">Orders</button>
 
-                        {/* ✅ Avatar dropdown */}
+                        {/* Avatar dropdown */}
                         <div className="relative" ref={menuRef}>
                             <img
                                 src={user?.profilePic || Avtar}
@@ -223,9 +256,63 @@ const freelancerDashboard = () => {
                             </div>
                         </div>
 
-                        <div className="p-6">
+                        {/*Projects */}
+                        <div className="p-6 pt-0">
+                            <h2 className="text-2xl font-semibold mb-4">Available Projects</h2>
 
+                            {loading ? (
+                                <p>Loading...</p>
+                            ) : projects.length === 0 ? (
+                                <p>No projects available</p>
+                            ) : (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pl-4">
+                                    {projects.map((p) => (
+                                        <ProjectCard key={p._id} project={p} />
+                                    ))}
+                                </div>
+                            )}
                         </div>
+
+                        {/*FAQ*/}
+                        <section className="bg-gray-50 py-10">
+                            <div className="max-w-6xl mx-auto px-4">
+                                <h2 className="text-3xl font-bold text-center mb-12">Q&amp;A</h2>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    {faqs.map((faq, index) => (
+                                        <div
+                                            key={index}
+                                            onClick={() =>
+                                                setOpenIndex(openIndex === index ? null : index)
+                                            }
+                                            className={`bg-white  shadow-sm border-l-4 transition-all duration-300 p-5 cursor-pointer group ${openIndex === index
+                                                ? "border-green-500 shadow-md"
+                                                : "border-transparent hover:border-green-500"
+                                                }`}
+                                        >
+                                            <div className="flex justify-between items-center">
+                                                <h3 className="font-semibold text-lg text-gray-800">
+                                                    {faq.question}
+                                                </h3>
+                                                <ChevronDown
+                                                    className={`w-5 h-5 text-gray-500 transition-transform duration-300 ${openIndex === index ? "rotate-180 text-green-600" : ""
+                                                        }`}
+                                                />
+                                            </div>
+
+                                            <div
+                                                className={`overflow-hidden transition-all duration-300 ${openIndex === index ? "max-h-40 mt-3" : "max-h-0"
+                                                    }`}
+                                            >
+                                                <p className="text-gray-600 text-sm leading-relaxed">
+                                                    {faq.answer}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
                     </>)}
 
 
@@ -238,7 +325,7 @@ const freelancerDashboard = () => {
                         >
                             ← Back
                         </button>
-                        <h1 className="text-2xl font-bold mb-4">Saved Freelancers ❤️</h1>
+                        <h1 className="text-2xl font-bold mb-4">Saved Projects</h1>
                     </>
                 )}
 
@@ -308,4 +395,4 @@ const freelancerDashboard = () => {
         </div>
     );
 };
-export default freelancerDashboard;
+export default FreelancerDashboard;

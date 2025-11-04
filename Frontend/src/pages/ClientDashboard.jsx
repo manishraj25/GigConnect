@@ -189,6 +189,8 @@ const ClientDashboard = () => {
 
                                     <button className="block px-4 py-2 w-full text-left hover:bg-gray-100">Your Project Briefs</button>
 
+                                    <button className="block px-4 py-2 w-full text-left hover:bg-gray-100">Your transactions</button>
+
                                     <button
                                         className="block px-4 py-2 w-full text-left text-red-500 hover:bg-gray-100"
                                         onClick={logout}

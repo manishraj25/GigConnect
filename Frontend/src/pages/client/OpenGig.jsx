@@ -1,0 +1,12 @@
+import React from "react";
+import { ArrowBigLeft } from "lucide-react";
+
+const OpenGig = () =>{
+    return(
+        <div>
+            <button><ArrowBigLeft/></button>
+            <h1>Freelancer's Gig</h1>
+        </div>
+    )
+};
+export default OpenGig;

@@ -21,7 +21,7 @@ const Login = () => {
         e.preventDefault();
         try {
             const user = await login(formData.email, formData.password);
-            if (user.role === "client") navigate("/clientDashboard");
+            if (user.role === "client") navigate("/client");
             else navigate("/freelancerDashboard");
         } catch (err) {
             alert(err.response?.data?.message || "Login failed");

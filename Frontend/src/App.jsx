@@ -6,9 +6,9 @@ import RolesSelect from "./pages/RolesSelect.jsx";
 import AuthNavbar from "./components/AuthNavbar";
 import HomeNavbar from "./components/HomeNavbar";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import ClientDashboard from "./pages/ClientDashboard.jsx";
 import FreelancerDashboard from "./pages/FreelancerDashboard.jsx";
 import Footer from "./components/Footer.jsx";
+import ClientDashboardLayout from "./pages/client/ClientDashboardLayout.jsx";
 
 function App() {
   const location = useLocation();
@@ -35,10 +35,10 @@ function App() {
         <Route path="/roles" element={<RolesSelect />} />
         <Route path="/signup" element={<Signup />} />
         <Route
-          path="/clientDashboard"
+          path="/client/*"
           element={
             <ProtectedRoute allowedRole="client">
-              <ClientDashboard />
+              <ClientDashboardLayout />
             </ProtectedRoute>
           }
         />
