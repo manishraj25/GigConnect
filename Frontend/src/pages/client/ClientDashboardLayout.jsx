@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import ClientNavbar from "../../components/ClientNavbar.jsx";
 import ClientDashboard from "./ClientDashboard.jsx";
 import ClientProfile from "./ClientProfile.jsx";
-import Messages from "./Messages.jsx";
+import Messages from "../Messages.jsx";
 import Notifications from "./Notifications.jsx";
 import Transactions from "./Transactions.jsx";
 import OpenGig from "./OpenGig.jsx";
@@ -20,7 +20,7 @@ const ClientDashboardLayout = () => {
       <ClientNavbar />
 
       {/* Client section routes */}
-      <div className="">
+      <div className="bg-gray-100 min-h-[90vh]">
         <Routes>
           <Route path="/" element={<ClientDashboard />} />
           <Route path="/savelist" element={<SaveList />} />

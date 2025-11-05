@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import FreelancerDashboard from "./pages/FreelancerDashboard.jsx";
 import Footer from "./components/Footer.jsx";
 import ClientDashboardLayout from "./pages/client/ClientDashboardLayout.jsx";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const location = useLocation();
@@ -52,6 +53,7 @@ function App() {
         />
       </Routes>
       <Footer />
+      <Toaster position="top-right" reverseOrder={false} />
     </>
   );
 }

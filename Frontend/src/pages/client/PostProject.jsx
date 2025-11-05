@@ -1,10 +1,12 @@
 import React from "react";
-import { ArrowBigLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 const PostProject = () =>{
+    const navigate =useNavigate;
     return(
-        <div>
-            <button><ArrowBigLeft/></button>
+        <div className="flex gap-3">
+            <button onClick={() => navigate("/client")}><ArrowLeft/></button>
             <h1>Post Your Project</h1>
         </div>
     )

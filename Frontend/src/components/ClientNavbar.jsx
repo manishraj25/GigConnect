@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState, useRef } from "react";
 import { AuthContext, useAuth } from "../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
+import API from "../api/api.js";
 import Avtar from "../assets/profile.png";
 
 const ClientNavbar = () => {
@@ -9,6 +10,8 @@ const ClientNavbar = () => {
   const [search, setSearch] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
+  const [clientProfile, setClientProfile] = useState(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
   const menuRef = useRef(null);
   const navigate = useNavigate();
 
@@ -22,6 +25,22 @@ const ClientNavbar = () => {
     "Full Stack Developer",
     "Backend Developer",
   ];
+
+  // Fetch client profile from /clients/me
+  useEffect(() => {
+    if (!user) return; // wait for user to be loaded
+    const fetchProfile = async () => {
+      try {
+        const res = await API.get("/clients/me");
+        setClientProfile(res.data);
+      } catch (err) {
+        console.error("Error loading client profile in navbar:", err);
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+    fetchProfile();
+  }, [user]);
 
   // close dropdown when clicked outside
   useEffect(() => {
@@ -51,7 +70,6 @@ const ClientNavbar = () => {
     setSuggestions([]);
   };
 
-  // navigate to search results
   const handleSearch = () => {
     if (search.trim() !== "") {
       navigate(`/client/search?query=${encodeURIComponent(search.trim())}`);
@@ -90,7 +108,6 @@ const ClientNavbar = () => {
             ></lord-icon>
           </button>
 
-          {/* Suggestions */}
           {suggestions.length > 0 && (
             <div className="absolute top-10 bg-white w-full shadow-lg rounded z-50">
               {suggestions.map((s, idx) => (
@@ -124,8 +141,8 @@ const ClientNavbar = () => {
           {/* Avatar dropdown */}
           <div className="relative" ref={menuRef}>
             <img
-              src={user?.profilePic || Avtar}
-              className="w-8 h-8 rounded-full cursor-pointer"
+              src={clientProfile?.profileImage?.url || Avtar}
+              className="w-8 h-8 rounded-full cursor-pointer object-cover"
               onClick={() => setMenuOpen(!menuOpen)}
             />
             {menuOpen && (
@@ -139,18 +156,22 @@ const ClientNavbar = () => {
                 >
                   Your Profile
                 </button>
-                <button className="block px-4 py-2 w-full text-left hover:bg-gray-100"
-                onClick={() => {
+                <button
+                  className="block px-4 py-2 w-full text-left hover:bg-gray-100"
+                  onClick={() => {
                     navigate("/client/postproject");
                     setMenuOpen(false);
-                  }}>
+                  }}
+                >
                   Post Project Brief
                 </button>
-                <button className="block px-4 py-2 w-full text-left hover:bg-gray-100"
-                onClick={() => {
+                <button
+                  className="block px-4 py-2 w-full text-left hover:bg-gray-100"
+                  onClick={() => {
                     navigate("/client/projectlist");
                     setMenuOpen(false);
-                  }}>
+                  }}
+                >
                   Your Project Briefs
                 </button>
                 <button
