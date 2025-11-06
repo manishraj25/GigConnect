@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import API from "../../api/api.js";
 import GigCard from "../../components/GigCard.jsx";
+import { ArrowLeft } from "lucide-react";
 
 const SearchResult = () => {
     const [results, setResults] = useState([]);
@@ -11,7 +12,7 @@ const SearchResult = () => {
         maxPrice: "",
         location: "",
     });
-    const navigate =useNavigate();
+    const navigate = useNavigate();
 
     const locationHook = useLocation();
     const query = new URLSearchParams(locationHook.search).get("query");
@@ -52,23 +53,23 @@ const SearchResult = () => {
         setFilters((prev) => ({ ...prev, [name]: value }));
     };
 
+    const handleCardClick = (id) => {
+        navigate(`/client/gigs/${id}`);
+    };
+
     return (
         <div className="p-6">
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-3 mb-2">
                 <button
                     onClick={() => navigate("/client")}
-                    className="p-2 hover:bg-gray-100 rounded-full transition cursor-pointer"
+                    className="p-2 hover:bg-gray-200 rounded-full transition cursor-pointer"
                 >
                     <ArrowLeft size={22} />
                 </button>
-                <h2 className="text-2xl font-semibold mb-4">
+                <h2 className="text-2xl font-semibold">
                     Search Results for “{query}”
                 </h2>
             </div>
-
-            <h2 className="text-2xl font-semibold mb-4">
-                Search Results for “{query}”
-            </h2>
 
             {/* Filter Section */}
             <div className="flex flex-wrap items-center gap-4 mb-6 bg-gray-100 p-4 rounded-lg">
@@ -122,9 +123,11 @@ const SearchResult = () => {
             ) : results.length === 0 ? (
                 <p>No freelancers found.</p>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="flex flex-wrap gap-4 justify-center">
                     {results.map((gig) => (
-                        <GigCard key={gig._id} gig={gig} />
+                        <div key={gig._id} className="w-full sm:w-[48%] md:w-[30%] lg:w-[22%]" onClick={() => handleCardClick(gig._id)}>
+                            <GigCard gig={gig} />
+                        </div>
                     ))}
                 </div>
             )}

@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Heart, Star } from "lucide-react";
-
+import API from "../api/api.js";
 
 const GigCard = ({ gig }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isSaved, setIsSaved] = useState(false);
   const images = gig?.images?.length ? gig.images : [];
 
   const nextImage = (e) => {
@@ -14,6 +15,42 @@ const GigCard = ({ gig }) => {
   const prevImage = (e) => {
     e.stopPropagation();
     setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  //Check if gig is already saved
+  useEffect(() => {
+    const checkSavedStatus = async () => {
+      try {
+        const res = await API.get("/savelist/saved");
+        const savedGigs = Array.isArray(res.data)
+          ? res.data
+          : res.data.savedGigs || [];
+
+        const saved = savedGigs.some(
+          (item) => item?.gig?._id === gig?._id
+        );
+        setIsSaved(saved);
+      } catch (error) {
+        console.error("Error checking saved gigs:", error);
+      }
+    };
+    checkSavedStatus();
+  }, [gig?._id]);
+
+  // Handle save/unsave toggle
+  const handleSaveToggle = async (e) => {
+    e.stopPropagation();
+    try {
+      if (isSaved) {
+        await API.delete(`/savelist/save/${gig._id}`);
+        setIsSaved(false);
+      } else {
+        await API.post(`/savelist/save/${gig._id}`);
+        setIsSaved(true);
+      }
+    } catch (error) {
+      console.error("Error saving/unsaving gig:", error);
+    }
   };
 
   return (
@@ -27,7 +64,7 @@ const GigCard = ({ gig }) => {
           />
         ) : (
           <img
-            src="https://via.placeholder.com/250x150?text=No+Image"
+            src="/no-image.png"
             alt="no-image"
             className="w-full h-full object-cover"
           />
@@ -35,20 +72,29 @@ const GigCard = ({ gig }) => {
 
         {images.length > 1 && (
           <>
-            <button onClick={prevImage} className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-1 rounded-full shadow-md hover:scale-110 transition">
+            <button
+              onClick={prevImage}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-1 rounded-full shadow-md hover:scale-110 transition"
+            >
               <ChevronLeft className="w-4 h-4 text-gray-700" />
             </button>
-            <button onClick={nextImage} className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-1 rounded-full shadow-md hover:scale-110 transition">
+            <button
+              onClick={nextImage}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-1 rounded-full shadow-md hover:scale-110 transition"
+            >
               <ChevronRight className="w-4 h-4 text-gray-700" />
             </button>
           </>
         )}
 
         <button
+          onClick={handleSaveToggle}
           className="absolute top-2 right-2 bg-white p-1.5 rounded-full shadow-md hover:scale-110 transition"
         >
           <Heart
-            className={`w-4 h-4`}// ${isSaved ? "text-red-500 fill-red-500" : "text-gray-700"}
+            className={`w-4 h-4 ${
+              isSaved ? "text-red-500 fill-red-500" : "text-gray-700"
+            }`}
           />
         </button>
       </div>
@@ -56,7 +102,10 @@ const GigCard = ({ gig }) => {
       <div className="p-3 space-y-1.5">
         <div className="flex items-center gap-2">
           <img
-            src={gig.freelancer?.profileImage?.url || "https://via.placeholder.com/40"}
+            src={
+              gig.freelancer?.profileImage?.url ||
+              "/profile-placeholder.png"
+            }
             alt="profile"
             className="w-8 h-8 rounded-full object-cover"
           />
@@ -70,7 +119,9 @@ const GigCard = ({ gig }) => {
         <div className="flex items-center text-sm text-gray-700">
           <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
           <span className="ml-1 font-semibold">{gig.rating || "5.0"}</span>
-          <span className="text-gray-500 ml-1">({gig.reviews || 739})</span>
+          <span className="text-gray-500 ml-1">
+            ({gig.reviews || 739})
+          </span>
         </div>
         <p className="text-[14px] font-semibold text-gray-800 mt-2">
           From ₹{gig.price?.toLocaleString() || "7,894"}

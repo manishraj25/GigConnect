@@ -2,55 +2,61 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext.jsx";
 import API from "../../api/api.js";
 import GigCard from "../../components/GigCard.jsx";
+import { useNavigate } from "react-router-dom";
 
 const ClientDashboard = () => {
     const { user } = useContext(AuthContext);
-        const [gigs, setGigs] = useState([]);
-        const [selectCategories, setSelectCategories] = useState("");
-        const [loading, setLoading] = useState(false);
-    
-    
-        const categories = [
-            "Web Developer",
-            "Web Development",
-            "UI/UX Designer",
-            "Logo Designer",
-            "Mobile Developer",
-            "Video Editor",
-            "Full Stack Developer",
-            "Backend Developer",
-        ];
-    
-        //Fetch all gigs
-        useEffect(() => {
-            const fetchAllGigs = async () => {
-                setLoading(true);
-                try {
-                    const res = await API.get(`/gigs`);
-                    const fetched = Array.isArray(res.data) ? res.data : res.data.gigs;
-                    setGigs(fetched || []);
-                } catch (err) {
-                    console.error("Error fetching gigs:", err);
-                } finally {
-                    setLoading(false);
-                }
-            };
-            fetchAllGigs();
-        }, []);
-    
-        //Handle category change
-        const handleCategories = (event) => {
-            setSelectCategories(event.target.value);
+    const [gigs, setGigs] = useState([]);
+    const [selectCategories, setSelectCategories] = useState("");
+    const [loading, setLoading] = useState(false);
+    const navigate =useNavigate();
+
+
+    const categories = [
+        "Web Developer",
+        "Web Development",
+        "UI/UX Designer",
+        "Logo Designer",
+        "Mobile Developer",
+        "Video Editor",
+        "Full Stack Developer",
+        "Backend Developer",
+    ];
+
+    //Fetch all gigs
+    useEffect(() => {
+        const fetchAllGigs = async () => {
+            setLoading(true);
+            try {
+                const res = await API.get(`/gigs`);
+                const fetched = Array.isArray(res.data) ? res.data : res.data.gigs;
+                setGigs(fetched || []);
+            } catch (err) {
+                console.error("Error fetching gigs:", err);
+            } finally {
+                setLoading(false);
+            }
         };
-    
-    
-    
-        //Filter gigs based on selected category
-        const displayedGigs = gigs.filter((gig) =>
-            selectCategories
-                ? gig.category?.toLowerCase() === selectCategories.toLowerCase()
-                : true
-        );
+        fetchAllGigs();
+    }, []);
+
+    //Handle category change
+    const handleCategories = (event) => {
+        setSelectCategories(event.target.value);
+    };
+
+
+
+    //Filter gigs based on selected category
+    const displayedGigs = gigs.filter((gig) =>
+        selectCategories
+            ? gig.category?.toLowerCase() === selectCategories.toLowerCase()
+            : true
+    );
+
+    const handleCardClick = (id) => {
+        navigate(`/client/gigs/${id}`);
+    };
 
 
     return (
@@ -134,7 +140,7 @@ const ClientDashboard = () => {
                                 }}
                             >
                                 {displayedGigs.map((gig) => (
-                                    <div key={gig._id} className="min-w-[250px] flex-shrink-0">
+                                    <div key={gig._id} className="min-w-[250px] shrink-0" onClick={() => handleCardClick(gig._id)}>
                                         <GigCard gig={gig} />
                                     </div>
                                 ))}

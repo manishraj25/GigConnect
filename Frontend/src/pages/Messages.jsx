@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 import API from "../api/api.js";
 import { AuthContext } from "../context/AuthContext.jsx";
 import { ArrowLeft, Send, Search } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const socket = io("http://localhost:5000", { withCredentials: true });
 
@@ -16,6 +16,17 @@ const Messages = () => {
     const [content, setContent] = useState("");
     const bottomRef = useRef(null);
     const navigate = useNavigate();
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
+    const chatWith = query.get("chatWith");
+
+
+    useEffect(() => {
+        if (chatWith && user) {
+            openChat(chatWith);
+        }
+    }, [chatWith, user]);
+
 
     useEffect(() => {
         if (user?._id) socket.emit("join", user._id);
@@ -125,7 +136,7 @@ const Messages = () => {
             {/* LEFT SIDEBAR */}
             <div
                 className={`${selectedChat ? "hidden md:flex" : "flex"
-                    } w-full md:w-[350px] bg-gray-50 rounded-lg flex-col transition-all m-2`}
+                    } w-full md:w-[350px] bg-gray-50 rounded-lg flex-col transition-all m-3 shadow mt-0`}
             >
                 <div className="flex items-center gap-3 p-2">
                     <button
@@ -194,7 +205,7 @@ const Messages = () => {
             {/* RIGHT CHAT AREA */}
             <div
                 className={`${selectedChat ? "flex" : "hidden md:flex"
-                    } flex-1 flex-col transition-all bg-gray-50 rounded-lg m-2`}
+                    } flex-1 flex-col transition-all bg-gray-50 rounded-lg m-3 mt-0 shadow`}
             >
                 {!selectedChat ? (
                     <div className="flex flex-col items-center justify-center h-full text-gray-400">
@@ -231,14 +242,14 @@ const Messages = () => {
                                 <div
                                     key={idx}
                                     className={`flex ${msg.from._id === user._id
-                                            ? "justify-end"
-                                            : "justify-start"
+                                        ? "justify-end"
+                                        : "justify-start"
                                         }`}
                                 >
                                     <div
                                         className={`px-4 py-2 rounded-2xl max-w-[70%] ${msg.from._id === user._id
-                                                ? "bg-green-500 text-white"
-                                                : "bg-gray-200 text-gray-800"
+                                            ? "bg-green-500 text-white"
+                                            : "bg-gray-200 text-gray-800"
                                             }`}
                                     >
                                         {msg.content}
