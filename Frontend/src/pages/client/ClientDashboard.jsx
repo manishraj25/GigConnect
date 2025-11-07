@@ -66,7 +66,8 @@ const ClientDashboard = () => {
                     Welcome to Gig<span className="text-green-600">Connect</span>, {user?.name}
                 </h1>
                 <div className="flex gap-5 mb-6 ml-5 ">
-                    <div className="py-2.5 px-5 rounded-2xl min-w-1/4 bg-white shadow hover:shadow-lg transition cursor-pointer">
+                    <div className="py-2.5 px-5 rounded-2xl min-w-1/4 bg-white shadow hover:shadow-lg transition cursor-pointer"
+                         onClick={()=>navigate("/client/postproject")}>
                         <h1 className="text-sm font-sans font-semibold text-gray-500">RECOMMENDED FOR YOU</h1>
                         <div className="flex items-center gap-2">
                             <div className="bg-gray-200 rounded-full p-2 flex items-center"><lord-icon
@@ -76,11 +77,12 @@ const ClientDashboard = () => {
                             </lord-icon></div>
                             <div>
                                 <div className="font-semibold">Post a project brief</div>
-                                <div className="text-gray-500">Get offers for your needs</div>
+                                <div className="text-gray-500" >Get offers for your needs</div>
                             </div>
                         </div>
                     </div>
-                    <div className="py-2.5 px-5 rounded-2xl min-w-1/4 bg-white shadow hover:shadow-lg transition cursor-pointer">
+                    <div className="py-2.5 px-5 rounded-2xl min-w-1/4 bg-white shadow hover:shadow-lg transition cursor-pointer"
+                         onClick={()=>navigate("/client/profile")}>
                         <h1 className="text-sm font-sans font-semibold text-gray-500">PROFILE PROGRESS</h1>
                         <div className="flex items-center gap-2">
                             <div className="bg-gray-200 rounded-full p-2 flex items-center"><lord-icon

@@ -22,7 +22,7 @@ const Login = () => {
         try {
             const user = await login(formData.email, formData.password);
             if (user.role === "client") navigate("/client");
-            else navigate("/freelancerDashboard");
+            else navigate("/freelancer");
         } catch (err) {
             alert(err.response?.data?.message || "Login failed");
         }

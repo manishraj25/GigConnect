@@ -46,7 +46,7 @@ const Signup = () => {
     try {
       const user = await signup(formData);
       if (user.role === "client") navigate("/client");
-      else navigate("/freelancerDashboard");
+      else navigate("/freelancer");
     } catch (err) {
       alert(err.response?.data?.message || "Signup failed");
     } finally {

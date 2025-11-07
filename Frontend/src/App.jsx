@@ -6,9 +6,9 @@ import RolesSelect from "./pages/RolesSelect.jsx";
 import AuthNavbar from "./components/AuthNavbar";
 import HomeNavbar from "./components/HomeNavbar";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import FreelancerDashboard from "./pages/FreelancerDashboard.jsx";
 import Footer from "./components/Footer.jsx";
 import ClientDashboardLayout from "./pages/client/ClientDashboardLayout.jsx";
+import FreelancerDashboardLayout from "./pages/freelancer/FreelancerDashboardLayout.jsx"
 import { Toaster } from "react-hot-toast";
 
 function App() {
@@ -44,10 +44,10 @@ function App() {
           }
         />
         <Route
-          path="/freelancerDashboard"
+          path="/freelancer/*"
           element={
             <ProtectedRoute allowedRole="freelancer">
-              <FreelancerDashboard />
+              <FreelancerDashboardLayout />
             </ProtectedRoute>
           }
         />
