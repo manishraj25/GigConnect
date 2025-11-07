@@ -61,21 +61,23 @@ export const upsertFreelancerProfile = async (req, res) => {
   }
 };
 
-//upload portfolio item
+// upload portfolio item
 export const addPortfolioItem = async (req, res) => {
   try {
     const userId = req.user.id;
     const { heading, description } = req.body;
     const freelancer = await Freelancer.findOne({ user: userId });
 
-    if (!freelancer)
+    if (!freelancer) {
       return res.status(404).json({ message: "Freelancer profile not found" });
+    }
 
-    let photos = [];
+    const photos = [];
 
-    //Handle multiple portfolio images
+    //Handle multiple portfolio images safely
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
+        // If Multer uses diskStorage, file.path is available
         const upload = await cloudinary.uploader.upload(file.path, {
           folder: "freelancer_portfolio",
         });
@@ -83,10 +85,11 @@ export const addPortfolioItem = async (req, res) => {
       }
     }
 
+    // Push new project to portfolio array
     freelancer.portfolio.push({
-      photos,
       heading,
       description,
+      photos,
     });
 
     await freelancer.save();
@@ -96,9 +99,87 @@ export const addPortfolioItem = async (req, res) => {
       portfolio: freelancer.portfolio,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error adding portfolio item:", error);
+    res.status(500).json({
+      message: "Server error while adding portfolio",
+      error: error.message,
+    });
   }
 };
+
+// Update portfolio item
+export const updatePortfolioItem = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+    const { heading, description } = req.body;
+
+    const freelancer = await Freelancer.findOne({ user: userId });
+    if (!freelancer)
+      return res.status(404).json({ message: "Freelancer profile not found" });
+
+    const portfolioItem = freelancer.portfolio.id(id);
+    if (!portfolioItem)
+      return res.status(404).json({ message: "Portfolio item not found" });
+
+    portfolioItem.heading = heading || portfolioItem.heading;
+    portfolioItem.description = description || portfolioItem.description;
+
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const upload = await cloudinary.uploader.upload(file.path, {
+          folder: "freelancer_portfolio",
+        });
+        portfolioItem.photos.push({
+          url: upload.secure_url,
+          public_id: upload.public_id,
+        });
+      }
+    }
+
+    await freelancer.save();
+    res.status(200).json({
+      message: "Portfolio item updated successfully",
+      portfolio: freelancer.portfolio,
+    });
+  } catch (error) {
+    console.error("Error updating portfolio item:", error);
+    res.status(500).json({ message: "Server error while updating portfolio" });
+  }
+};
+
+// Delete portfolio item
+export const deletePortfolioItem = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+
+    const freelancer = await Freelancer.findOne({ user: userId });
+    if (!freelancer)
+      return res.status(404).json({ message: "Freelancer profile not found" });
+
+    const item = freelancer.portfolio.id(id);
+    if (!item)
+      return res.status(404).json({ message: "Portfolio item not found" });
+
+    // Delete images from Cloudinary
+    for (const photo of item.photos) {
+      if (photo.public_id) await cloudinary.uploader.destroy(photo.public_id);
+    }
+
+    item.deleteOne();
+    await freelancer.save();
+
+    res.status(200).json({
+      message: "Portfolio item deleted successfully",
+      portfolio: freelancer.portfolio,
+    });
+  } catch (error) {
+    console.error("Error deleting portfolio item:", error);
+    res.status(500).json({ message: "Server error while deleting portfolio" });
+  }
+};
+
 
 //Get my freelancer profile
 export const getMyProfile = async (req, res) => {
