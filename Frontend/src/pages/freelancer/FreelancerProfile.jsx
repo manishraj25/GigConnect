@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import API from "../../api/api.js";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, X, } from "lucide-react";
+import Avtar from "../../assets/profile.png"
 
 const FreelancerProfile = () => {
   const [freelancer, setFreelancer] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [profileExists, setProfileExists] = useState(false);
   const [portfolioData, setPortfolioData] = useState({
     heading: "",
     description: "",
@@ -23,6 +25,14 @@ const FreelancerProfile = () => {
       try {
         const res = await API.get("/freelancers/me");
         setFreelancer(res.data);
+
+        if (res.data.profileExists === false) {
+        setProfileExists(false);
+      } else {
+        setFreelancer(res.data.freelancer);
+        setProfileExists(true);
+      }
+
       } catch (err) {
         toast.error("Failed to load profile");
       }
@@ -169,7 +179,7 @@ const FreelancerProfile = () => {
         <div className="flex flex-col sm:flex-row items-center gap-6">
           <div className="relative">
             <img
-              src={freelancer.profileImage?.url || "/default-profile.png"}
+              src={freelancer.profileImage?.url || Avtar}
               alt="Profile"
               className="w-28 h-28 rounded-full object-cover border-4 border-green-500"
             />
@@ -204,7 +214,7 @@ const FreelancerProfile = () => {
                 <input
                   value={freelancer.headline || ""}
                   onChange={(e) => handleChange("headline", e.target.value)}
-                  className="border rounded px-2 py-1 w-full"
+                  className="border rounded px-2 py-1 w-4/5"
                   placeholder="Add headline"
                 />
               ) : (
@@ -213,15 +223,32 @@ const FreelancerProfile = () => {
                 </p>
               )}
             </div>
-            <button
-              onClick={() =>
-                isEditing ? handleSaveProfile() : setIsEditing(true)
-              }
-              disabled={loading}
-              className="h-10 px-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-            >
-              {isEditing ? "Save" : "Edit Profile"}
-            </button>
+            {!isEditing ? (
+              <button
+                onClick={() => setIsEditing(true)}
+                disabled={loading}
+                className="h-10 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+              >
+                {profileExists ? "Edit Profile" : "Add Details"}
+              </button>
+            ) : (
+              <div className="flex gap-3">
+                <button
+                  onClick={handleSaveProfile}
+                  disabled={loading}
+                  className="h-10 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setIsEditing(false)}
+                  disabled={loading}
+                  className="h-10 px-4 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

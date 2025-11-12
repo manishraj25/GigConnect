@@ -26,21 +26,23 @@ const FreelancerNavbar = () => {
     "Backend Developer",
   ];
 
-  // Fetch client profile from /clients/me
+  // Fetch profile
   useEffect(() => {
-    if (!user) return; // wait for user to be loaded
+    if (!user) return;
     const fetchProfile = async () => {
       try {
         const res = await API.get("/freelancers/me");
         setFreelancerProfile(res.data);
       } catch (err) {
-        console.error("Error loading client profile in navbar:", err);
+        console.error("Error loading freelancer profile in navbar:", err);
       } finally {
         setLoadingProfile(false);
       }
     };
     fetchProfile();
   }, [user]);
+
+  console.log(freelancerProfile);
 
   // close dropdown when clicked outside
   useEffect(() => {
@@ -141,7 +143,7 @@ const FreelancerNavbar = () => {
           {/* Avatar dropdown */}
           <div className="relative" ref={menuRef}>
             <img
-              src={freelancerProfile?.profileImage?.url || Avtar}
+              src={freelancerProfile?.freelancer?.profileImage?.url || Avtar}
               className="w-8 h-8 rounded-full cursor-pointer object-cover"
               onClick={() => setMenuOpen(!menuOpen)}
             />

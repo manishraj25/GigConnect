@@ -1,8 +1,9 @@
-import React, { useContext, useEffect, useState} from "react";
-import { AuthContext} from "../../context/AuthContext.jsx";
+import React, { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../context/AuthContext.jsx";
 import API from "../../api/api.js";
 import ProjectCard from "../../components/ProjectCard.jsx";
 import { ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 
 const faqs = [
@@ -37,6 +38,44 @@ const FreelancerDashboard = () => {
     const [openIndex, setOpenIndex] = useState(null);
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [freelancer, setFreelancer] = useState(null);
+    const navigate = useNavigate();
+    const [loadingFreelancer, setLoadingFreelancer] = useState(true);
+
+    useEffect(() => {
+        const fetchFreelancer = async () => {
+            try {
+                const res = await API.get(`/freelancers/me`);
+                setFreelancer(res.data);
+            } catch (err) {
+                if (err.response && err.response.status === 404) {
+                    console.warn("No freelancer profile found");
+                    setFreelancer(null);
+                } else {
+                    console.error("Error loading freelancer data:", err);
+                }
+            } finally {
+                setLoadingFreelancer(false);
+            }
+        };
+
+        if (user?._id) fetchFreelancer();
+    }, [user]);
+
+    //Define fields
+    const isProfileComplete =
+        !!freelancer &&
+        !!freelancer.freelancer?.headline?.trim() &&
+        !!freelancer.freelancer?.location?.address?.trim() &&
+        !!freelancer.freelancer?.location?.city?.trim() &&
+        !!freelancer.freelancer?.location?.state?.trim() &&
+        !!freelancer.freelancer?.location?.country?.trim() &&
+        !!freelancer.freelancer?.profileImage?.url &&
+        !!freelancer.freelancer?.about?.trim() &&
+        Array.isArray(freelancer.freelancer?.skills) && freelancer.freelancer?.skills.length > 0 &&
+        Array.isArray(freelancer.freelancer?.searchTags) && freelancer.freelancer?.searchTags.length > 0 &&
+        Array.isArray(freelancer.freelancer?.portfolio) && freelancer.freelancer?.portfolio.length > 0;
+
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -53,23 +92,20 @@ const FreelancerDashboard = () => {
         fetchProjects();
     }, []);
 
-    // close profile menu when clicking outside
-    useEffect(() => {
-        const handler = (e) => {
-            if (menuRef.current && !menuRef.current.contains(e.target)) {
-                setMenuOpen(false);
-            }
-        };
-        document.addEventListener("mousedown", handler);
-        return () => document.removeEventListener("mousedown", handler);
-    }, []);
-
 
     return (
         <>
             <div className="p-6 bg-linear-to-b from-green-100 to-transparent">
                 <h1 className="font-bold text-3xl mb-4 ">
-                    Welcome to Gig<span className="text-green-600">Connect</span>, {user?.name}
+                    {user?.firstLogin ? (
+                        <>
+                            Welcome to Gig<span className="text-green-600">Connect</span>, {user?.name}
+                        </>
+                    ) : (
+                        <>
+                            Welcome back, <span className="text-green-600">{user?.name}</span>
+                        </>
+                    )}
                 </h1>
                 <div className="flex gap-5 mb-6 ml-5 ">
                     <div className="py-2.5 px-5 rounded-2xl min-w-1/4 bg-white shadow hover:shadow-lg transition cursor-pointer">
@@ -86,20 +122,31 @@ const FreelancerDashboard = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="py-2.5 px-5 rounded-2xl min-w-1/4 bg-white shadow hover:shadow-lg transition cursor-pointer">
-                        <h1 className="text-sm font-sans font-semibold text-gray-500">PROFILE PROGRESS</h1>
-                        <div className="flex items-center gap-2">
-                            <div className="bg-gray-200 rounded-full p-2 flex items-center"><lord-icon
-                                src="https://cdn.lordicon.com/qlpudrww.json"
-                                colors="primary:#000000"
-                                className="w-6 h-6">
-                            </lord-icon></div>
-                            <div>
-                                <div className="font-semibold">Your profile is not completed</div>
-                                <div className="text-gray-500">Complete it to get tailored suggestion</div>
+                    {!loadingFreelancer && !isProfileComplete && (
+                        <div
+                            className="py-2.5 px-5 rounded-2xl min-w-1/4 bg-white shadow hover:shadow-lg transition cursor-pointer"
+                            onClick={() => navigate("/freelancer/profile")}
+                        >
+                            <h1 className="text-sm font-sans font-semibold text-gray-500">
+                                PROFILE PROGRESS
+                            </h1>
+                            <div className="flex items-center gap-2">
+                                <div className="bg-gray-200 rounded-full p-2 flex items-center">
+                                    <lord-icon
+                                        src="https://cdn.lordicon.com/qlpudrww.json"
+                                        colors="primary:#000000"
+                                        className="w-6 h-6"
+                                    ></lord-icon>
+                                </div>
+                                <div>
+                                    <div className="font-semibold">Your profile is not completed</div>
+                                    <div className="text-gray-500">
+                                        Complete it to get tailored suggestion
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
 

@@ -13,7 +13,7 @@ const ClientDashboardLayout = () => {
       <FreelancerNavbar />
 
       {/* freelancer section routes */}
-      <div className="bg-gray-100 min-h-[90vh] py-2">
+      <div className="bg-gray-100 min-h-[90vh]">
         <Routes>
           <Route path="/" element={<FreelancerDashboard />} />
           <Route path="/profile" element={<FreelancerProfile />} />

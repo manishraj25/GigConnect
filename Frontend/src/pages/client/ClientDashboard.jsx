@@ -9,7 +9,30 @@ const ClientDashboard = () => {
     const [gigs, setGigs] = useState([]);
     const [selectCategories, setSelectCategories] = useState("");
     const [loading, setLoading] = useState(false);
-    const navigate =useNavigate();
+    const navigate = useNavigate();
+    const [client, setClient] = useState(null);
+
+    useEffect(() => {
+        const fetchClient = async () => {
+            try {
+                const res = await API.get(`/clients/me`);
+                setClient(res.data);
+            } catch (err) {
+                console.error("Error loading client data:", err);
+            }
+        };
+        if (user) fetchClient();
+    }, [user]);
+
+    // Define fields that are required
+    const isProfileComplete =
+        !!client &&
+        !!client.companyName &&
+        !!client.location?.address &&
+        !!client.location?.city &&
+        !!client.location?.state &&
+        !!client.location?.country &&
+        !!client.profileImage?.url;
 
 
     const categories = [
@@ -63,11 +86,19 @@ const ClientDashboard = () => {
         <>
             <div className="p-6 bg-linear-to-b from-green-100 to-transparent">
                 <h1 className="font-bold text-3xl mb-4 ">
-                    Welcome to Gig<span className="text-green-600">Connect</span>, {user?.name}
+                    {user?.firstLogin ? (
+                        <>
+                            Welcome to Gig<span className="text-green-600">Connect</span>, {user?.name}
+                        </>
+                    ) : (
+                        <>
+                            Welcome back, <span className="text-green-600">{user?.name}</span>
+                        </>
+                    )}
                 </h1>
                 <div className="flex gap-5 mb-6 ml-5 ">
                     <div className="py-2.5 px-5 rounded-2xl min-w-1/4 bg-white shadow hover:shadow-lg transition cursor-pointer"
-                         onClick={()=>navigate("/client/postproject")}>
+                        onClick={() => navigate("/client/postproject")}>
                         <h1 className="text-sm font-sans font-semibold text-gray-500">RECOMMENDED FOR YOU</h1>
                         <div className="flex items-center gap-2">
                             <div className="bg-gray-200 rounded-full p-2 flex items-center"><lord-icon
@@ -81,21 +112,31 @@ const ClientDashboard = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="py-2.5 px-5 rounded-2xl min-w-1/4 bg-white shadow hover:shadow-lg transition cursor-pointer"
-                         onClick={()=>navigate("/client/profile")}>
-                        <h1 className="text-sm font-sans font-semibold text-gray-500">PROFILE PROGRESS</h1>
-                        <div className="flex items-center gap-2">
-                            <div className="bg-gray-200 rounded-full p-2 flex items-center"><lord-icon
-                                src="https://cdn.lordicon.com/qlpudrww.json"
-                                colors="primary:#000000"
-                                className="w-6 h-6">
-                            </lord-icon></div>
-                            <div>
-                                <div className="font-semibold">Your profile is not completed</div>
-                                <div className="text-gray-500">Complete it to get tailored suggestion</div>
+                    {!isProfileComplete && (
+                        <div
+                            className="py-2.5 px-5 rounded-2xl min-w-1/4 bg-white shadow hover:shadow-lg transition cursor-pointer"
+                            onClick={() => navigate("/client/profile")}
+                        >
+                            <h1 className="text-sm font-sans font-semibold text-gray-500">
+                                PROFILE PROGRESS
+                            </h1>
+                            <div className="flex items-center gap-2">
+                                <div className="bg-gray-200 rounded-full p-2 flex items-center">
+                                    <lord-icon
+                                        src="https://cdn.lordicon.com/qlpudrww.json"
+                                        colors="primary:#000000"
+                                        className="w-6 h-6"
+                                    ></lord-icon>
+                                </div>
+                                <div>
+                                    <div className="font-semibold">Your profile is not completed</div>
+                                    <div className="text-gray-500">
+                                        Complete it to get tailored suggestion
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
 

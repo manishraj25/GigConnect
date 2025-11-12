@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Edit, Trash2, Loader2, Save, X } from "lucide-react";
+import { ArrowLeft, Edit, Loader2, Save, X,  Plus} from "lucide-react";
 import API from "../../api/api.js";
 import toast from "react-hot-toast";
 
@@ -20,6 +20,7 @@ const ClientProfile = () => {
     profileImage: null,
   });
   const [preview, setPreview] = useState("");
+  const [profileExists, setProfileExists] = useState(false);
 
   // Fetch client profile
   useEffect(() => {
@@ -27,6 +28,14 @@ const ClientProfile = () => {
       try {
         const res = await API.get("/clients/me");
         setProfile(res.data);
+
+        if (res.data.profileExists === false) {
+          setProfileExists(false);
+        } else {
+          setProfileExists(true);
+          setProfile(res.data);
+        }
+
         setFormData({
           name: user?.name || "",
           email: user?.email || "",
@@ -63,7 +72,7 @@ const ClientProfile = () => {
     }
   };
 
-  // Handle image upload + live preview
+  // Handle image upload
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setFormData({ ...formData, profileImage: file });
@@ -73,7 +82,7 @@ const ClientProfile = () => {
     }
   };
 
-  // Save updated profile (with name & email backend update)
+  // Save updated profile
   const handleSave = async () => {
     const toastId = toast.loading("Updating profile...");
     try {
@@ -82,7 +91,7 @@ const ClientProfile = () => {
         email: formData.email,
       });
 
-      //Update client-specific data (companyName, image, location)
+      //Update client-specific data
       const formDataToSend = new FormData();
       formDataToSend.append("companyName", formData.companyName);
       formDataToSend.append("location[address]", formData.location.address);
@@ -99,7 +108,6 @@ const ClientProfile = () => {
 
       setProfile(res.data.client);
 
-      // Update context user locally
       const updatedUser = { ...user, name: formData.name, email: formData.email };
       setUser(updatedUser);
 
@@ -283,13 +291,15 @@ const ClientProfile = () => {
                 onClick={() => setIsEditing(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
               >
-                <Edit size={18} /> Edit Profile
-              </button>
-              <button
-                onClick={handleDelete}
-                className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-              >
-                <Trash2 size={18} /> Delete
+                {profileExists ? (
+                  <>
+                    <Edit size={18} /> Edit Profile
+                  </>
+                ) : (
+                  <>
+                    <Plus size={18} /> Add Details
+                  </>
+                )}
               </button>
             </>
           )}
