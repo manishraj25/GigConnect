@@ -139,7 +139,7 @@ const FreelancerProfile = () => {
                 initial={{ x: 300 }}
                 animate={{ x: 0 }}
                 exit={{ x: -300 }}
-                transition={{ type: "spring", stiffness: 200, damping: 30 }}
+                transition={{ type: "tween", ease: "easeInOut", duration: 0.25 }}
               >
                 {freelancer.portfolio
                   .slice(portfolioIndex, portfolioIndex + cardsPerView)

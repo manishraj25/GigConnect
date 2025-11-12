@@ -55,8 +55,8 @@ const SaveList = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 w-full pl-4">
           {savedGigs.map((item) => (
-            <div onClick={() => handleCardClick(item.gig._id)}>
-            <GigCard key={item.gig._id} gig={item.gig} />
+            <div key={item.gig?._id || item._id} onClick={() => handleCardClick(item.gig?._id)}>
+            <GigCard gig={item.gig} />
             </div>
           ))}
         </div>

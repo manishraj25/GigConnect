@@ -81,8 +81,8 @@ const FreelancerDashboard = () => {
                                 className="w-6 h-6">
                             </lord-icon></div>
                             <div>
-                                <div className="font-semibold">Post a project brief</div>
-                                <div className="text-gray-500">Get offers for your needs</div>
+                                <div className="font-semibold">Post your gig</div>
+                                <div className="text-gray-500">Get hired according to your gigs</div>
                             </div>
                         </div>
                     </div>

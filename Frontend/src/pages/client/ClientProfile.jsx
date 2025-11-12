@@ -77,13 +77,12 @@ const ClientProfile = () => {
   const handleSave = async () => {
     const toastId = toast.loading("Updating profile...");
     try {
-      // 1️⃣ Update user name & email in backend
       await API.put("/clients/update-user", {
         name: formData.name,
         email: formData.email,
       });
 
-      // 2️⃣ Update client-specific data (companyName, image, location)
+      //Update client-specific data (companyName, image, location)
       const formDataToSend = new FormData();
       formDataToSend.append("companyName", formData.companyName);
       formDataToSend.append("location[address]", formData.location.address);
