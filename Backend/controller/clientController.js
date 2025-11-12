@@ -48,17 +48,29 @@ export const upsertClientProfile = async (req, res) => {
   }
 };
 
-//Get my client profile
+// Get My Client Profile
 export const getMyProfile = async (req, res) => {
   try {
     const userId = req.user.id;
 
     const client = await Client.findOne({ user: userId }).populate("user", "-password");
-    if (!client) return res.status(404).json({ message: "Client profile not found" });
 
-    res.json(client);
+    if (!client) {
+      const user = await User.findById(userId).select("-password");
+      return res.status(200).json({
+        message: "Client profile not created yet",
+        user,
+        profileExists: false,
+      });
+    }
+
+    res.status(200).json({
+      ...client.toObject(),
+      profileExists: true,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error fetching client profile:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

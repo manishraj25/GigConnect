@@ -9,9 +9,9 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 const messageRouter = express.Router();
 
+messageRouter.get("/", authMiddleware, getChatsSummary);
+messageRouter.put("/mark-read", authMiddleware, markAsRead);
 messageRouter.post("/", authMiddleware, sendMessage);
 messageRouter.get("/:otherUserId", authMiddleware, getConversation);
-messageRouter.put("/mark-read", authMiddleware, markAsRead);
-messageRouter.get("/", authMiddleware, getChatsSummary); //all chat summaries
 
 export default messageRouter;

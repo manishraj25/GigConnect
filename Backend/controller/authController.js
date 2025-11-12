@@ -26,6 +26,14 @@ const registerUser = async (req, res) => {
             role
         });
 
+        // Check if it's first login after signup
+        let isFirstLogin = false;
+        if (user.firstLogin) {
+            isFirstLogin = true;
+            user.firstLogin = false;
+            await user.save(); 
+        }
+
 
         const token = generateToken(user);
         res.cookie('token', token, {
@@ -35,7 +43,7 @@ const registerUser = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
-        res.status(201).json({ success: true, message: 'User registered successfully', user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+        res.status(201).json({ success: true, message: 'User registered successfully', user: { id: user._id, name: user.name, email: user.email, role: user.role, firstLogin: isFirstLogin  } });
 
     } catch (err) {
         console.error('registerUser error:', err);
@@ -55,6 +63,7 @@ const loginUser = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
+
         const token = generateToken(user);
         res.cookie('token', token, {
             httpOnly: true,
@@ -62,7 +71,7 @@ const loginUser = async (req, res) => {
             sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'lax',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
-        res.json({ success: true, message: 'Logged in successfully', user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+        res.json({ success: true, message: 'Logged in successfully', user: { id: user._id, name: user.name, email: user.email, role: user.role} });
     } catch (err) {
         console.error('authUser error:', err);
         res.status(500).json({ message: 'Server error' });
@@ -87,5 +96,5 @@ const logoutUser = async (req, res) => {
 
 
 
-export { registerUser, loginUser, logoutUser};
+export { registerUser, loginUser, logoutUser };
 

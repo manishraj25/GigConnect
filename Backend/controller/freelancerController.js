@@ -181,23 +181,31 @@ export const deletePortfolioItem = async (req, res) => {
 };
 
 
-//Get my freelancer profile
+// Get my freelancer profile safely
 export const getMyProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const freelancer = await Freelancer.findOne({ user: userId }).populate(
-      "user",
-      "-password"
-    );
 
-    if (!freelancer)
-      return res.status(404).json({ message: "Freelancer profile not found" });
+    const freelancer = await Freelancer.findOne({ user: userId })
+      .populate("user", "-password");
 
-    res.json(freelancer);
+    if (!freelancer) {
+      return res.status(200).json({
+        profileExists: false,
+        message: "Freelancer profile not found",
+      });
+    }
+
+    res.status(200).json({
+      profileExists: true,
+      freelancer,
+    });
   } catch (error) {
+    console.error("Error fetching freelancer profile:", error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 //Update user info (name, email, password)
 export const updateUserInfo = async (req, res) => {
@@ -210,7 +218,7 @@ export const updateUserInfo = async (req, res) => {
 
     if (name) user.name = name;
     if (email) user.email = email;
-    if (password) user.password = password; 
+    if (password) user.password = password;
 
     await user.save();
     res.json({ message: "User info updated successfully", user });
