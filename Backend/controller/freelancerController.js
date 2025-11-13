@@ -181,7 +181,7 @@ export const deletePortfolioItem = async (req, res) => {
 };
 
 
-// Get my freelancer profile safely
+// Get my freelancer profile 
 export const getMyProfile = async (req, res) => {
   try {
     const userId = req.user.id;

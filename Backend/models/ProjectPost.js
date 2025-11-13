@@ -7,6 +7,7 @@ const projectPostSchema = new mongoose.Schema({
     skillsRequired: { type: [String], default: [] },
     budget: { type: Number, required: true },
     deadline: { type: Date, required: true },
+    searchTags: { type: [String], default: [] },
     status: { type: String, enum: ['open', 'in progress', 'completed', 'closed'], default: 'open' }
 }, { timestamps: true });
 
