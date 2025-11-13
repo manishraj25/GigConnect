@@ -21,7 +21,7 @@ const GigCard = ({ gig }) => {
   useEffect(() => {
     const checkSavedStatus = async () => {
       try {
-        const res = await API.get("/savelist/saved");
+        const res = await API.get("/savelist/saved/gigs");
         const savedGigs = Array.isArray(res.data)
           ? res.data
           : res.data.savedGigs || [];
@@ -42,10 +42,10 @@ const GigCard = ({ gig }) => {
     e.stopPropagation();
     try {
       if (isSaved) {
-        await API.delete(`/savelist/save/${gig._id}`);
+        await API.delete(`/savelist/gig/${gig._id}`);
         setIsSaved(false);
       } else {
-        await API.post(`/savelist/save/${gig._id}`);
+        await API.post(`/savelist/gig/${gig._id}`);
         setIsSaved(true);
       }
     } catch (error) {

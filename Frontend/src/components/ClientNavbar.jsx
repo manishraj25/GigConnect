@@ -26,9 +26,9 @@ const ClientNavbar = () => {
     "Backend Developer",
   ];
 
-  // Fetch client profile from /clients/me
+  // Fetch client profile
   useEffect(() => {
-    if (!user) return; // wait for user to be loaded
+    if (!user) return;
     const fetchProfile = async () => {
       try {
         const res = await API.get("/clients/me");
@@ -168,7 +168,7 @@ const ClientNavbar = () => {
                 <button
                   className="block px-4 py-2 w-full text-left hover:bg-gray-100"
                   onClick={() => {
-                    navigate("/client/projectlist");
+                    navigate("/client/postproject");
                     setMenuOpen(false);
                   }}
                 >

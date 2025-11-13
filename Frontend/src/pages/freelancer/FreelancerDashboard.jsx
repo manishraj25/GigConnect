@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext.jsx";
 import API from "../../api/api.js";
 import ProjectCard from "../../components/ProjectCard.jsx";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ArrowLeft, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 
@@ -41,6 +41,11 @@ const FreelancerDashboard = () => {
     const [freelancer, setFreelancer] = useState(null);
     const navigate = useNavigate();
     const [loadingFreelancer, setLoadingFreelancer] = useState(true);
+    const [showMore, setShowMore] = useState(false);
+    const scrollRef = React.useRef(null);
+    const [atStart, setAtStart] = useState(true);
+    const [atEnd, setAtEnd] = useState(false);
+
 
     useEffect(() => {
         const fetchFreelancer = async () => {
@@ -90,6 +95,33 @@ const FreelancerDashboard = () => {
             }
         };
         fetchProjects();
+    }, []);
+
+
+    const scrollContainer = (direction) => {
+        if (scrollRef.current) {
+            const { scrollLeft, clientWidth } = scrollRef.current;
+            const scrollAmount = clientWidth * 0.8;
+            const newScrollLeft =
+                direction === "left" ? scrollLeft - scrollAmount : scrollLeft + scrollAmount;
+            scrollRef.current.scrollTo({
+                left: newScrollLeft,
+                behavior: "smooth",
+            });
+        }
+    };
+
+    // Track scroll position
+    const handleScroll = () => {
+        if (!scrollRef.current) return;
+        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        setAtStart(scrollLeft <= 10);
+        setAtEnd(scrollLeft + clientWidth >= scrollWidth - 10);
+    };
+
+    // Trigger on mount
+    useEffect(() => {
+        handleScroll();
     }, []);
 
 
@@ -150,22 +182,89 @@ const FreelancerDashboard = () => {
                 </div>
             </div>
 
-            {/*Projects */}
+            {/* Projects Section */}
             <div className="p-6 pt-0">
-                <h2 className="text-2xl font-semibold mb-4">Available Projects</h2>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-2xl font-semibold">Available Projects</h2>
+                </div>
 
                 {loading ? (
                     <p>Loading...</p>
-                ) : projects.length === 0 ? (
-                    <p>No projects available</p>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pl-4">
-                        {projects.map((p) => (
-                            <ProjectCard key={p._id} project={p} />
-                        ))}
-                    </div>
+                    (() => {
+                        const openProjects = projects.filter(
+                            (p) => p.status?.toLowerCase() === "open"
+                        );
+
+                        if (openProjects.length === 0) {
+                            return <p>No open projects available</p>;
+                        }
+
+                        return (
+                            <>
+                                {/*Large Screens: Horizontal Slide with Buttons */}
+                                <div className="relative hidden md:block">
+                                    {openProjects.length > 3 && (
+                                        <>
+                                            <button
+                                                onClick={() => scrollContainer("left")}
+                                                className={`absolute -left-6 top-1/2 -translate-y-1/2 bg-white shadow-md hover:bg-gray-100 rounded-full p-3 z-10 transition-opacity duration-300 ${atStart ? "opacity-0 pointer-events-none" : "opacity-100"
+                                                    }`}
+                                            >
+                                                <ArrowLeft/>
+                                            </button>
+                                            <button
+                                                onClick={() => scrollContainer("right")}
+                                                className={`absolute -right-6 top-1/2 -translate-y-1/2 bg-white shadow-md hover:bg-gray-100 rounded-full p-3 z-10 transition-opacity duration-300 ${atEnd ? "opacity-0 pointer-events-none" : "opacity-100"
+                                                    }`}
+                                            >
+                                                <ArrowRight/>
+                                            </button>
+                                        </>
+                                    )}
+
+                                    <div
+                                        ref={scrollRef}
+                                        onScroll={handleScroll}
+                                        className="flex gap-6 overflow-hidden scroll-smooth pl-5"
+                                        style={{ scrollBehavior: "smooth" }}
+                                    >
+                                        {openProjects.map((p) => (
+                                            <div key={p._id} className="w-1/3 shrink-0">
+                                                <ProjectCard project={p} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Small Screens: Column with Show More */}
+                                <div className="md:hidden">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                        {openProjects
+                                            .slice(0, showMore ? openProjects.length : 4)
+                                            .map((p) => (
+                                                <ProjectCard key={p._id} project={p} />
+                                            ))}
+                                    </div>
+
+                                    {openProjects.length > 4 && (
+                                        <div className="flex justify-center mt-4">
+                                            <button
+                                                onClick={() => setShowMore(!showMore)}
+                                                className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                                            >
+                                                {showMore ? "Show Less" : "Show More"}
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </>
+                        );
+                    })()
                 )}
             </div>
+
+
 
             {/*FAQ*/}
             <section className="bg-gray-50 py-10">

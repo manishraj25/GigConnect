@@ -42,7 +42,6 @@ const FreelancerNavbar = () => {
     fetchProfile();
   }, [user]);
 
-  console.log(freelancerProfile);
 
   // close dropdown when clicked outside
   useEffect(() => {
@@ -92,7 +91,7 @@ const FreelancerNavbar = () => {
         <div className="relative border rounded w-[68vw] flex items-center justify-between h-11">
           <input
             type="text"
-            placeholder="Search freelancers..."
+            placeholder="Search for projects..."
             className="px-4 outline-none w-full py-2 rounded-l"
             value={search}
             onChange={handleTyping}
@@ -133,7 +132,7 @@ const FreelancerNavbar = () => {
           <button onClick={() => navigate("/freelancer/messages")} className="cursor-pointer w-5 h-5">
             <lord-icon src="https://cdn.lordicon.com/bpptgtfr.json" colors="primary:#000000"></lord-icon>
           </button>
-          <button onClick={() => navigate("/freelancer/savelist")} className="cursor-pointer w-5 h-5">
+          <button onClick={() => navigate("/freelancer/savedprojects")} className="cursor-pointer w-5 h-5">
             <lord-icon src="https://cdn.lordicon.com/hsabxdnr.json" colors="primary:#000000"></lord-icon>
           </button>
           <button onClick={() => navigate("/freelancer/orders")} className="hover:text-green-600 hover:underline cursor-pointer">

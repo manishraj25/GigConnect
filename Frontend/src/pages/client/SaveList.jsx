@@ -12,7 +12,7 @@ const SaveList = () => {
   useEffect(() => {
         const fetchSavedGigs = async () => {
             try {
-                const res = await API.get("/savelist/saved");
+                const res = await API.get("/savelist/saved/gigs");
                 setSavedGigs(res.data.savedGigs); // array of saved gigs
             } catch (err) {
                 console.error("Failed to fetch saved gigs:", err);

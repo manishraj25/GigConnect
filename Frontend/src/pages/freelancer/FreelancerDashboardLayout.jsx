@@ -4,6 +4,7 @@ import FreelancerDashboard from "./FreelancerDashboard";
 import FreelancerNavbar from "../../components/FreelancerNavbar";
 import FreelancerProfile from "./FreelancerProfile";
 import Messages from "../Messages";
+import SavedProjects from "./SavedProjects";
 
 
 const ClientDashboardLayout = () => {
@@ -18,7 +19,8 @@ const ClientDashboardLayout = () => {
           <Route path="/" element={<FreelancerDashboard />} />
           <Route path="/profile" element={<FreelancerProfile />} />
           <Route path="/messages" element={<Messages />} />
-          {/* <Route path="/savelist" element={<SaveList />} />
+          <Route path="/savedprojects" element={<SavedProjects />} />
+          {/* 
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/orders" element={<ClientOrders />} />
           <Route path="/transactions" element={<Transactions />} />
