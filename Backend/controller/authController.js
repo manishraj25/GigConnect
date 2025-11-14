@@ -40,7 +40,7 @@ const registerUser = async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+            maxAge: 7 * 24 * 60 * 60 * 1000 
         });
 
         res.status(201).json({ success: true, message: 'User registered successfully', user: { id: user._id, name: user.name, email: user.email, role: user.role, firstLogin: isFirstLogin  } });

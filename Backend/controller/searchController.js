@@ -7,7 +7,6 @@ export const searchFreelancers = async (req, res) => {
   try {
     const { searchTag, location, minPrice, maxPrice } = req.query;
 
-    // Step 1: Build freelancer query
     const freelancerQuery = {};
 
     if (searchTag) {
@@ -19,7 +18,6 @@ export const searchFreelancers = async (req, res) => {
       ];
     }
 
-    // Step 2: Find matching freelancers
     const freelancers = await Freelancer.find(freelancerQuery)
       .populate("user", "name email")
       .select("_id searchTags skills location user headline");
@@ -28,13 +26,11 @@ export const searchFreelancers = async (req, res) => {
       return res.status(404).json({ message: "No freelancers found for this search tag." });
     }
 
-    // Step 3: Collect freelancer IDs
     const freelancerIds = freelancers.map((f) => f._id);
 
-    // Step 4: Build gigs query
     const gigQuery = { freelancer: { $in: freelancerIds } };
 
-    // Optional: Filter gigs by price range
+    // Filter gigs by price range
     if (minPrice || maxPrice) {
       gigQuery["price.minPrice"] = {};
       gigQuery["price.maxPrice"] = {};
@@ -43,7 +39,6 @@ export const searchFreelancers = async (req, res) => {
       if (maxPrice) gigQuery["price.maxPrice"].$lte = Number(maxPrice);
     }
 
-    // Step 5: Get gigs for matched freelancers
     let gigs = await Gigs.find(gigQuery)
       .populate({
         path: "freelancer",
@@ -51,7 +46,6 @@ export const searchFreelancers = async (req, res) => {
       })
       .select("-__v -updatedAt");
 
-    // Step 6: Optional location filter
     if (location) {
       gigs = gigs.filter((gig) => {
         const loc = gig.freelancer.location || {};
@@ -67,7 +61,7 @@ export const searchFreelancers = async (req, res) => {
       return res.status(404).json({ message: "No gigs found matching these filters." });
     }
 
-    // Step 7: Return results
+    //  Return results
     res.status(200).json({
       success: true,
       totalResults: gigs.length,
@@ -87,25 +81,33 @@ export const searchFreelancers = async (req, res) => {
 };
 
 
-//Search projects (for Freelancers)
+// Search projects (for Freelancers)
 export const searchProjects = async (req, res) => {
   try {
-    const { skills, minBudget, maxBudget, status } = req.query;
+    const { skills, minBudget, maxBudget, status, tags } = req.query;
 
     const query = {};
 
+    // Filter by skills
     if (skills) {
       query.skillsRequired = { $in: skills.split(",").map((s) => s.trim()) };
     }
 
+    // Filter by project status
     if (status) {
       query.status = status;
     }
 
+    // Filter by budget range
     if (minBudget || maxBudget) {
       query.budget = {};
       if (minBudget) query.budget.$gte = Number(minBudget);
       if (maxBudget) query.budget.$lte = Number(maxBudget);
+    }
+
+    // Filter by searchTags (NEW FEATURE)
+    if (tags) {
+      query.searchTags = { $in: tags.split(",").map((t) => t.trim()) };
     }
 
     const projects = await ProjectPost.find(query)
@@ -117,3 +119,4 @@ export const searchProjects = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+

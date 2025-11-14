@@ -2,7 +2,7 @@ import ProjectPost from "../models/ProjectPost.js";
 import Client from "../models/Client.js";
 
 
-//Create a new Project (Client)
+// Create a new Project (Client)
 export const createProject = async (req, res) => {
   try {
     const { title, description, skillsRequired, budget, deadline } = req.body;
@@ -12,7 +12,7 @@ export const createProject = async (req, res) => {
     if (!clientData)
       return res.status(404).json({ message: "Client profile not found" });
 
-    // Basic validations
+    // Validations
     if (!title || !description || !budget || !deadline)
       return res.status(400).json({ message: "Missing required fields" });
 
@@ -31,15 +31,18 @@ export const createProject = async (req, res) => {
       deadline,
     });
 
-    // Populate client & user info for response
+    // Populate client + user + profileImage
     const populatedProject = await project.populate({
       path: "client",
-      populate: { path: "user", select: "name email" },
-      select: "companyName location",
+      select: "companyName location profileImage",
+      populate: {
+        path: "user",
+        select: "name email",                    
+      },
     });
 
     res.status(201).json({
-      message: "✅ Project created successfully",
+      message: " Project created successfully",
       project: populatedProject,
     });
   } catch (error) {
@@ -49,17 +52,18 @@ export const createProject = async (req, res) => {
 };
 
 
+
 // Get all Projects (Public)
 export const getAllProjects = async (req, res) => {
   try {
     const projects = await ProjectPost.find()
       .populate({
         path: "client",
+        select: "companyName location profileImage", 
         populate: {
           path: "user",
           select: "name email",
         },
-        select: "companyName location",
       })
       .sort({ createdAt: -1 })
       .select("-__v");
@@ -75,17 +79,18 @@ export const getAllProjects = async (req, res) => {
 };
 
 
+
 // Get a Single Project by ID
 export const getProjectById = async (req, res) => {
   try {
     const project = await ProjectPost.findById(req.params.id)
       .populate({
         path: "client",
+        select: "companyName location profileImage",
         populate: {
           path: "user",
           select: "name email",
         },
-        select: "companyName location",
       })
       .select("-__v");
 
@@ -100,7 +105,8 @@ export const getProjectById = async (req, res) => {
 };
 
 
-// Get all Projects by Logged-in Client
+
+// Get Logged-in Client Projects
 export const getClientProjects = async (req, res) => {
   try {
     const clientData = await Client.findOne({ user: req.user.id });
@@ -110,8 +116,11 @@ export const getClientProjects = async (req, res) => {
     const projects = await ProjectPost.find({ client: clientData.id })
       .populate({
         path: "client",
-        populate: { path: "user", select: "name email" },
-        select: "companyName location",
+        select: "companyName location profileImage",
+        populate: {
+          path: "user",
+          select: "name email",
+        },
       })
       .sort({ createdAt: -1 })
       .select("-__v");
@@ -127,7 +136,8 @@ export const getClientProjects = async (req, res) => {
 };
 
 
-// Update a Project (Client Only)
+
+// Update Project
 export const updateProject = async (req, res) => {
   try {
     const project = await ProjectPost.findById(req.params.id);
@@ -148,7 +158,7 @@ export const updateProject = async (req, res) => {
     );
 
     return res.json({
-      message: "✅ Project updated successfully",
+      message: " Project updated successfully",
       project: updatedProject,
     });
   } catch (error) {
@@ -158,7 +168,8 @@ export const updateProject = async (req, res) => {
 };
 
 
-// Delete a Project (Client Only)
+
+// Delete Project
 export const deleteProject = async (req, res) => {
   try {
     const project = await ProjectPost.findById(req.params.id);
@@ -173,7 +184,7 @@ export const deleteProject = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized" });
 
     await project.deleteOne();
-    res.json({ message: "✅ Project deleted successfully" });
+    res.json({ message: " Project deleted successfully" });
   } catch (error) {
     console.error("Error deleting project:", error);
     res.status(500).json({ message: error.message });

@@ -1,7 +1,45 @@
 import Message from "../models/Message.js";
 import User from "../models/User.js";
+import Client from "../models/Client.js";
+import Freelancer from "../models/Freelancer.js";
 
-//Send message
+
+// Helper to fetch user details
+const getUserWithProfile = async (userId) => {
+  const user = await User.findById(userId).select("name email");
+
+  if (!user) return null;
+
+  // Check Client
+  const client = await Client.findOne({ user: userId }).select("profileImage");
+  if (client) {
+    return {
+      _id: user._id,
+      name: user.name,
+      profileImage: client.profileImage || null,
+    };
+  }
+
+  // Check Freelancer
+  const freelancer = await Freelancer.findOne({ user: userId }).select("profileImage");
+  if (freelancer) {
+    return {
+      _id: user._id,
+      name: user.name,
+      profileImage: freelancer.profileImage || null,
+    };
+  }
+
+  return {
+    _id: user._id,
+    name: user.name,
+    profileImage: null,
+  };
+};
+
+
+
+// SEND MESSAGE
 export const sendMessage = async (req, res) => {
   try {
     const { to, content } = req.body;
@@ -10,14 +48,17 @@ export const sendMessage = async (req, res) => {
     if (!to || !content)
       return res.status(400).json({ message: "Recipient and content are required" });
 
-    const recipient = await User.findById(to);
-    if (!recipient) return res.status(404).json({ message: "Recipient not found" });
-
     const message = await Message.create({ from, to, content });
-    const populatedMsg = await message.populate([
-      { path: "from", select: "name profileImage" },
-      { path: "to", select: "name profileImage" },
-    ]);
+
+    // Fetch full profile for both users
+    const fromUser = await getUserWithProfile(from);
+    const toUser = await getUserWithProfile(to);
+
+    const populatedMsg = {
+      ...message._doc,
+      from: fromUser,
+      to: toUser,
+    };
 
     res.status(201).json({ message: "Message sent", data: populatedMsg });
   } catch (error) {
@@ -25,7 +66,8 @@ export const sendMessage = async (req, res) => {
   }
 };
 
-//Get full conversation between two users
+
+// GET FULL CONVERSATION
 export const getConversation = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -36,20 +78,28 @@ export const getConversation = async (req, res) => {
         { from: userId, to: otherUserId },
         { from: otherUserId, to: userId },
       ],
-    })
-      .sort({ createdAt: 1 })
-      .populate([
-        { path: "from", select: "name profileImage" },
-        { path: "to", select: "name profileImage" },
-      ]);
+    }).sort({ createdAt: 1 });
 
-    res.status(200).json({ total: messages.length, messages });
+    const finalMessages = [];
+    for (const msg of messages) {
+      const fromUser = await getUserWithProfile(msg.from);
+      const toUser = await getUserWithProfile(msg.to);
+
+      finalMessages.push({
+        ...msg._doc,
+        from: fromUser,
+        to: toUser,
+      });
+    }
+
+    res.status(200).json({ total: finalMessages.length, messages: finalMessages });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
-//Mark messages as read (and return count)
+
+// MARK AS READ
 export const markAsRead = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -60,49 +110,48 @@ export const markAsRead = async (req, res) => {
       { $set: { read: true } }
     );
 
-    res.status(200).json({ message: "Messages marked as read", updated: result.modifiedCount });
+    res.status(200).json({
+      message: "Messages marked as read",
+      updated: result.modifiedCount,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
-//Get chat summaries (last message + unread count)
+
+// GET CHATS SUMMARY 
 export const getChatsSummary = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // All messages where user is sender or receiver
     const messages = await Message.find({
       $or: [{ from: userId }, { to: userId }],
-    })
-      .sort({ createdAt: -1 })
-      .populate([
-        { path: "from", select: "name profileImage" },
-        { path: "to", select: "name profileImage" },
-      ]);
+    }).sort({ createdAt: -1 });
 
     const chats = {};
 
     for (const msg of messages) {
-      const otherUser =
-        msg.from.id.toString() === userId.toString() ? msg.to : msg.from;
-      const otherId = otherUser._id.toString();
+      const otherUserId =
+        msg.from.toString() === userId.toString() ? msg.to : msg.from;
 
-      if (!chats[otherId]) {
-        chats[otherId] = {
-          user: otherUser,
+      if (!chats[otherUserId]) {
+        const otherUserProfile = await getUserWithProfile(otherUserId);
+
+        chats[otherUserId] = {
+          user: otherUserProfile,
           lastMessage: msg,
           unreadCount: 0,
         };
       }
 
-      // Count unread messages where current user is the recipient
-      if (msg.to.id.toString() === userId.toString() && !msg.read) {
-        chats[otherId].unreadCount++;
+      if (msg.to.toString() === userId.toString() && !msg.read) {
+        chats[otherUserId].unreadCount++;
       }
     }
 
     const chatList = Object.values(chats);
+
     res.status(200).json({ total: chatList.length, chats: chatList });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });

@@ -2,6 +2,7 @@ import SaveList from "../models/SaveList.js";
 import Gigs from "../models/Gigs.js";
 import ProjectPost from "../models/ProjectPost.js";
 
+
 //save gig
 export const saveGig = async (req, res) => {
   try {
@@ -23,7 +24,9 @@ export const saveGig = async (req, res) => {
   }
 };
 
-//remove gig
+
+
+//remove saved gigs
 export const removeSavedGig = async (req, res) => {
   try {
     const clientId = req.user.id;
@@ -34,7 +37,8 @@ export const removeSavedGig = async (req, res) => {
       gig: gigId
     });
 
-    if (!deleted) return res.status(404).json({ message: "Saved gig not found" });
+    if (!deleted)
+      return res.status(404).json({ message: "Saved gig not found" });
 
     res.status(200).json({ message: "Gig removed from saved list" });
   } catch (err) {
@@ -42,17 +46,26 @@ export const removeSavedGig = async (req, res) => {
   }
 };
 
-//get all gigs
+
+
+//get all projects
 export const getSavedGigs = async (req, res) => {
   try {
     const clientId = req.user.id;
 
-    const savedGigs = await SaveList.find({ user: clientId, gig: { $ne: null } })
+    const savedGigs = await SaveList.find({
+      user: clientId,
+      gig: { $ne: null }
+    })
       .populate({
         path: "gig",
         populate: {
           path: "freelancer",
-          populate: { path: "user", select: "name profileImage" }
+          select: "profileImage headline location",
+          populate: {
+            path: "user",
+            select: "name email"
+          }
         }
       })
       .sort({ savedAt: -1 });
@@ -63,13 +76,19 @@ export const getSavedGigs = async (req, res) => {
   }
 };
 
-//save project
+
+
+//save projects
 export const saveProject = async (req, res) => {
   try {
     const freelancerId = req.user.id;
     const projectId = req.params.id;
 
-    const exists = await SaveList.findOne({ user: freelancerId, project: projectId });
+    const exists = await SaveList.findOne({
+      user: freelancerId,
+      project: projectId
+    });
+
     if (exists)
       return res.status(400).json({ message: "Project already saved" });
 
@@ -85,7 +104,9 @@ export const saveProject = async (req, res) => {
   }
 };
 
-//remove project
+
+
+//remove saved projects
 export const removeSavedProject = async (req, res) => {
   try {
     const freelancerId = req.user.id;
@@ -105,6 +126,8 @@ export const removeSavedProject = async (req, res) => {
   }
 };
 
+
+
 //get all projects
 export const getSavedProjects = async (req, res) => {
   try {
@@ -116,10 +139,16 @@ export const getSavedProjects = async (req, res) => {
     })
       .populate({
         path: "project",
-        populate: {
-          path: "client",
-          select: "name email"
-        }
+        populate: [
+          {
+            path: "client",
+            select: "companyName location profileImage", 
+            populate: {
+              path: "user",
+              select: "name email"
+            }
+          }
+        ]
       })
       .sort({ savedAt: -1 });
 
