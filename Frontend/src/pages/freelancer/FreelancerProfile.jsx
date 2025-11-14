@@ -60,7 +60,7 @@ const FreelancerProfile = () => {
     }
   };
 
-  // Inline editing handlers
+  // editing handlers
   const handleChange = (field, value) => {
     setFreelancer((prev) => ({ ...prev, [field]: value }));
   };

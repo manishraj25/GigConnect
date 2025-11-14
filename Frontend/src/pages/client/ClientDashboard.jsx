@@ -3,6 +3,7 @@ import { AuthContext } from "../../context/AuthContext.jsx";
 import API from "../../api/api.js";
 import GigCard from "../../components/GigCard.jsx";
 import { useNavigate } from "react-router-dom";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const ClientDashboard = () => {
     const { user } = useContext(AuthContext);
@@ -160,14 +161,14 @@ const ClientDashboard = () => {
                     <p className="text-gray-600">No gigs found.</p>
                 ) : (
                     <>
-                        {/* Mobile: vertical list (show up to 5) */}
+                        {/* Mobile: vertical list */}
                         < div className="grid grid-cols-1 gap-4 sm:hidden mt-6 px-3">
                             {displayedGigs.slice(0, 5).map((gig) => (
                                 <GigCard key={gig._id} gig={gig} />
                             ))}
                         </div>
 
-                        {/* Desktop/Tablet: horizontal scroll with Prev/Next buttons */}
+                        {/* Desktop/Tablet: horizontal list */}
                         <div className="hidden sm:block relative mt-6 px-3">
                             <div
                                 id="gigScrollContainer"
@@ -198,15 +199,7 @@ const ClientDashboard = () => {
                                 }}
                                 className="absolute top-1/2 left-3 -translate-y-1/2 bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition opacity-0 pointer-events-none z-10"
                             >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="w-5 h-5"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                </svg>
+                                <ArrowLeft/>
                             </button>
 
                             {/* Next Button */}
@@ -217,15 +210,7 @@ const ClientDashboard = () => {
                                 }}
                                 className="absolute top-1/2 right-3 -translate-y-1/2 bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition z-10"
                             >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="w-5 h-5"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
+                                <ArrowRight/>
                             </button>
                         </div>
                     </>

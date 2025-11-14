@@ -72,8 +72,9 @@ const FreelancerNavbar = () => {
   };
 
   const handleSearch = () => {
-    if (search.trim() !== "") {
-      navigate(`/client/search?query=${encodeURIComponent(search.trim())}`);
+    const queryText = search.trim();
+    if (queryText !== "") {
+      navigate(`/freelancer/search?tag=${encodeURIComponent(queryText)}`);
     }
   };
 
@@ -139,7 +140,7 @@ const FreelancerNavbar = () => {
             Orders
           </button>
 
-          {/* Avatar dropdown */}
+          {/* Profile dropdown */}
           <div className="relative" ref={menuRef}>
             <img
               src={freelancerProfile?.freelancer?.profileImage?.url || Avtar}

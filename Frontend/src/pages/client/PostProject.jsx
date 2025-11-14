@@ -17,7 +17,7 @@ const PostProject = () => {
         skillsRequired: "",
         budget: "",
         deadline: "",
-        searchTags: "", // NEW FIELD
+        searchTags: "",
     });
 
     // Fetch client projects

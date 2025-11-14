@@ -10,7 +10,7 @@ import OpenGig from "./OpenGig.jsx";
 import PostProject from "./PostProject.jsx";
 import ClientOrders from "./ClientOrders.jsx";
 import SaveList from "./Savelist.jsx";
-import SeachResult from "./SearchResult.jsx";
+import SearchResult from "./SearchResult.jsx";
 import FreelancerProfile from "./FreelancerProfile.jsx";
 import Proposals from "./Proposals.jsx";
 
@@ -32,7 +32,7 @@ const ClientDashboardLayout = () => {
           <Route path="/profile" element={<ClientProfile />} />
           <Route path="/gigs/:id" element={<OpenGig />} />
           <Route path="/postproject" element={<PostProject />} />
-          <Route path="/search" element={<SeachResult />} />
+          <Route path="/search" element={<SearchResult />} />
           <Route path="/freelancerprofile/:id" element={<FreelancerProfile/>}/>
           <Route path="/proposals" element={<Proposals/>}/>
         </Routes>

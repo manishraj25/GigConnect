@@ -54,8 +54,7 @@ const SavedProjects = () => {
 
                 {!loading && savedProjects.length === 0 && (
                     <div className="text-center py-24">
-                        <p className="text-xl text-gray-600">You haven’t saved any projects yet.</p>
-                        <p className="text-gray-500 mt-2">Click the ❤️ button on a project to save it.</p>
+                        <p className="text-xl text-gray-600">You haven’t saved any projects yet..</p>
                     </div>
                 )}
 

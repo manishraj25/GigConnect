@@ -6,7 +6,7 @@ const Proposals = () =>{
     const navigate =useNavigate();
     return(
         <div className="flex gap-3">
-            <button onClick={() => navigate("/client/postproject")}><ArrowLeft/></button>
+            <button onClick={() => navigate("/client")}><ArrowLeft/></button>
             <h1>Proposals</h1>
         </div>
     )

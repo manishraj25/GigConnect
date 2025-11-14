@@ -5,9 +5,11 @@ import FreelancerNavbar from "../../components/FreelancerNavbar";
 import FreelancerProfile from "./FreelancerProfile";
 import Messages from "../Messages";
 import SavedProjects from "./SavedProjects";
+import SearchResult from "./SearchResult";
+import PostGig from "./PostGig";
 
 
-const ClientDashboardLayout = () => {
+const FreelancerDashboardLayout = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navbar for all freelancer pages */}
@@ -20,20 +22,12 @@ const ClientDashboardLayout = () => {
           <Route path="/profile" element={<FreelancerProfile />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/savedprojects" element={<SavedProjects />} />
-          {/* 
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/orders" element={<ClientOrders />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/profile" element={<ClientProfile />} />
-          <Route path="/gigs/:id" element={<OpenGig />} />
-          <Route path="/postproject" element={<PostProject />} />
-          <Route path="/projectlist" element={<ProjectList />} />
-          <Route path="/search" element={<SeachResult />} />
-          <Route path="/freelancerprofile/:id" element={<FreelancerProfile/>}/> */}
+          <Route path="/search" element={<SearchResult />} />
+          <Route path="/postgig" element={<PostGig />} />
         </Routes>
       </div>
     </div>
   );
 };
 
-export default ClientDashboardLayout;
+export default FreelancerDashboardLayout;

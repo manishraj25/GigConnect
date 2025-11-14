@@ -138,7 +138,7 @@ const ClientNavbar = () => {
             Orders
           </button>
 
-          {/* Avatar dropdown */}
+          {/* Profile dropdown */}
           <div className="relative" ref={menuRef}>
             <img
               src={clientProfile?.profileImage?.url || Avtar}

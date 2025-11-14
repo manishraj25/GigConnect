@@ -11,7 +11,7 @@ const OpenGig = () => {
     const navigate = useNavigate();
     const [gig, setGig] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [saved, setSaved] = useState(false); // state to track if gig is saved
+    const [saved, setSaved] = useState(false); 
 
     useEffect(() => {
         const fetchGig = async () => {

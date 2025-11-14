@@ -140,7 +140,8 @@ const FreelancerDashboard = () => {
                     )}
                 </h1>
                 <div className="flex gap-5 mb-6 ml-5 ">
-                    <div className="py-2.5 px-5 rounded-2xl min-w-1/4 bg-white shadow hover:shadow-lg transition cursor-pointer">
+                    <div className="py-2.5 px-5 rounded-2xl min-w-1/4 bg-white shadow hover:shadow-lg transition cursor-pointer"
+                         onClick={() => navigate("/freelancer/postgig")}>
                         <h1 className="text-sm font-sans font-semibold text-gray-500">RECOMMENDED FOR YOU</h1>
                         <div className="flex items-center gap-2">
                             <div className="bg-gray-200 rounded-full p-2 flex items-center"><lord-icon
@@ -202,7 +203,7 @@ const FreelancerDashboard = () => {
 
                         return (
                             <>
-                                {/*Large Screens: Horizontal Slide with Buttons */}
+                                {/*Large Screens */}
                                 <div className="relative hidden md:block">
                                     {openProjects.length > 3 && (
                                         <>
@@ -237,7 +238,7 @@ const FreelancerDashboard = () => {
                                     </div>
                                 </div>
 
-                                {/* Small Screens: Column with Show More */}
+                                {/* Small Screens */}
                                 <div className="md:hidden">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                         {openProjects

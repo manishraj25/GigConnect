@@ -91,7 +91,6 @@ const ClientProfile = () => {
         email: formData.email,
       });
 
-      //Update client-specific data
       const formDataToSend = new FormData();
       formDataToSend.append("companyName", formData.companyName);
       formDataToSend.append("location[address]", formData.location.address);

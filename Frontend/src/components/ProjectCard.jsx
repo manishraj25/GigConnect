@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Calendar, DollarSign, Briefcase, Heart } from "lucide-react";
-import DefaultAvatar from "../assets/profile.png";
+import Avatar from "../assets/profile.png";
 import API from "../api/api.js";
 
 const ProjectCard = ({ project }) => {
@@ -16,7 +16,7 @@ const ProjectCard = ({ project }) => {
   } = project;
 
   const clientName = client?.user?.name || "Unknown Client";
-  const clientImage = client?.profileImage?.url || DefaultAvatar;
+  const clientImage = client?.profileImage?.url || Avatar;
 
  
   const [saved, setSaved] = useState(false);
@@ -115,7 +115,7 @@ const ProjectCard = ({ project }) => {
       <div className="flex justify-between items-center text-sm text-gray-700 mb-2">
         <div className="flex items-center gap-1">
           <DollarSign className="w-4 h-4 text-green-600" />
-          <span>{budget ? `₹${budget}` : "Budget not specified"}</span>
+          <span>{budget ? `${budget}` : "Budget not specified"}</span>
         </div>
         <div className="flex items-center gap-1">
           <Calendar className="w-4 h-4 text-green-600" />

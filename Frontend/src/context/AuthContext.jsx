@@ -1,14 +1,12 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import API from "../api/api.js";
 
-// Create Context
 const AuthContext = createContext();
-
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);      // stores user object {id, name, email, role}
+  const [user, setUser] = useState(null); 
   const [loading, setLoading] = useState(true); 
 
   // Auto-load user from cookie

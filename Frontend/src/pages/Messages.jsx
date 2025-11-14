@@ -6,7 +6,7 @@ import { ArrowLeft, Send, Search } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Avtar from "../assets/profile.png"
 
-let socket; //single instance
+let socket; 
 
 const Messages = () => {
   const { user } = useContext(AuthContext);
@@ -68,7 +68,6 @@ const Messages = () => {
         otherUser =
           msgs[0].from._id === user._id ? msgs[0].to : msgs[0].from;
       } else {
-        // Fallback: fetch user data
         const userRes = await API.get(`/auth/${otherUserId}`);
         otherUser =
           userRes.data.user || userRes.data || { _id: otherUserId, name: "Unknown" };
@@ -77,14 +76,12 @@ const Messages = () => {
       setSelectedChat(otherUser);
       setMessages(msgs);
 
-      // reset unread count
       setChats((prev) =>
         prev.map((chat) =>
           chat.user._id === otherUserId ? { ...chat, unreadCount: 0 } : chat
         )
       );
 
-      // mark messages as read
       try {
         await API.put("/messages/mark-read", { from: otherUserId });
         socket.emit("markRead", { from: otherUserId, to: user._id });
@@ -133,7 +130,7 @@ const Messages = () => {
     return () => socket.off("receiveMessage", handleReceive);
   }, [selectedChat, user]);
 
-  // Scroll to bottom when messages change
+  
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -144,14 +141,11 @@ const Messages = () => {
     const newMsg = { from: user._id, to: selectedChat._id, content };
 
     try {
-      // instantly show
       setMessages((prev) => [...prev, { from: user, to: selectedChat, content }]);
       setContent("");
 
-      // emit to socket
       socket.emit("sendMessage", newMsg);
 
-      // update chat list
       setChats((prev) => {
         const updated = [...prev];
         const existing = updated.find((c) => c.user._id === selectedChat._id);
@@ -177,7 +171,7 @@ const Messages = () => {
   );
 
   return (
-    <div className="flex h-[90vh] w-full">
+    <div className="flex h-[90vh] w-full py-2.5">
       {/* LEFT SIDEBAR */}
       <div
         className={`${selectedChat ? "hidden md:flex" : "flex"
