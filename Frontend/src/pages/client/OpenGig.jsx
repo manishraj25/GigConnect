@@ -20,7 +20,7 @@ const OpenGig = () => {
                 setGig(res.data);
 
                 // check if gig is already saved by client
-                const savedRes = await API.get("/savelist/saved");
+                const savedRes = await API.get("/savelist/saved/gigs");
                 const isSaved = savedRes.data.savedGigs.some(s => s.gig._id === id);
                 setSaved(isSaved);
 
@@ -66,11 +66,11 @@ const OpenGig = () => {
         try {
             if (saved) {
                 // remove saved gig
-                await API.delete(`/savelist/save/${id}`);
+                await API.delete(`/savelist/gig/${id}`);
                 setSaved(false);
             } else {
                 // save gig
-                await API.post(`/savelist/save/${id}`);
+                await API.post(`/savelist/gig/${id}`);
                 setSaved(true);
             }
         } catch (err) {

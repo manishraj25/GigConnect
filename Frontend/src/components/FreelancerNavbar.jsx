@@ -161,20 +161,20 @@ const FreelancerNavbar = () => {
                 <button
                   className="block px-4 py-2 w-full text-left hover:bg-gray-100"
                   onClick={() => {
-                    navigate("/client/postproject");
+                    navigate("/freelancer/postgig");
                     setMenuOpen(false);
                   }}
                 >
-                  Post Project Brief
+                  Post Your Gig
                 </button>
                 <button
                   className="block px-4 py-2 w-full text-left hover:bg-gray-100"
                   onClick={() => {
-                    navigate("/client/projectlist");
+                    navigate("/freelancer/postgig");
                     setMenuOpen(false);
                   }}
                 >
-                  Your Project Briefs
+                  Your Gigs
                 </button>
                 <button
                   onClick={() => navigate("/client/transactions")}

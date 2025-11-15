@@ -3,10 +3,10 @@ import { io } from "socket.io-client";
 import API from "../api/api.js";
 import { AuthContext } from "../context/AuthContext.jsx";
 import { ArrowLeft, Send, Search } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
-import Avtar from "../assets/profile.png"
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import Avtar from "../assets/profile.png";
 
-let socket; 
+let socket;
 
 const Messages = () => {
   const { user } = useContext(AuthContext);
@@ -18,10 +18,14 @@ const Messages = () => {
   const bottomRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+
   const query = new URLSearchParams(location.search);
   const chatWith = query.get("chatWith");
 
-  //Initialize socket once
+  const [searchParams] = useSearchParams();
+  const openChatWith = searchParams.get("chatWith");
+
+  // Initialize socket only once
   useEffect(() => {
     if (!socket) {
       socket = io("http://localhost:5000", { withCredentials: true });
@@ -36,7 +40,7 @@ const Messages = () => {
     };
   }, [user]);
 
-  // Auto-open chat when navigated from Gig page
+  // Auto-open chat from navigation
   useEffect(() => {
     if (chatWith && user?._id) {
       openChat(chatWith);
@@ -56,7 +60,7 @@ const Messages = () => {
     fetchChats();
   }, []);
 
-  // Open specific chat
+  // Open chat with specific user
   const openChat = async (otherUserId) => {
     try {
       const res = await API.get(`/messages/${otherUserId}`);
@@ -86,14 +90,14 @@ const Messages = () => {
         await API.put("/messages/mark-read", { from: otherUserId });
         socket.emit("markRead", { from: otherUserId, to: user._id });
       } catch (err) {
-        console.warn("Mark-read failed (optional):", err.message);
+        console.warn("Mark-read failed:", err.message);
       }
     } catch (err) {
       console.error("Error loading chat:", err);
     }
   };
 
-  // Handle socket incoming messages
+  // SOCKET: Handle real-time incoming messages
   useEffect(() => {
     if (!socket) return;
 
@@ -130,7 +134,7 @@ const Messages = () => {
     return () => socket.off("receiveMessage", handleReceive);
   }, [selectedChat, user]);
 
-  
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -138,6 +142,7 @@ const Messages = () => {
   // Send message
   const handleSend = async () => {
     if (!content.trim() || !selectedChat) return;
+
     const newMsg = { from: user._id, to: selectedChat._id, content };
 
     try {
@@ -149,6 +154,7 @@ const Messages = () => {
       setChats((prev) => {
         const updated = [...prev];
         const existing = updated.find((c) => c.user._id === selectedChat._id);
+
         if (existing) {
           existing.lastMessage = newMsg;
         } else {
@@ -158,6 +164,7 @@ const Messages = () => {
             unreadCount: 0,
           });
         }
+
         return updated;
       });
     } catch (err) {
@@ -165,10 +172,14 @@ const Messages = () => {
     }
   };
 
-  // Search filter
+  // Search Filter
   const filteredChats = chats.filter((chat) =>
     chat.user?.name?.toLowerCase().includes(search.toLowerCase())
   );
+
+  // ❌ Removed broken block that caused your error
+  // It used "conversations" which does NOT exist
+  // And it blocked scrolling
 
   return (
     <div className="flex h-[90vh] w-full py-2.5">
@@ -199,7 +210,7 @@ const Messages = () => {
           />
         </div>
 
-        {/* Chat list */}
+        {/* Chat List */}
         <div className="flex-1 overflow-y-auto">
           {filteredChats.length === 0 ? (
             <p className="text-center text-gray-400 mt-10">
@@ -237,7 +248,7 @@ const Messages = () => {
         </div>
       </div>
 
-      {/* RIGHT CHAT PANEL */}
+      {/* RIGHT CHAT */}
       <div
         className={`${selectedChat ? "flex" : "hidden md:flex"
           } flex-1 flex-col transition-all bg-gray-50 rounded-lg mx-3 shadow`}
@@ -276,24 +287,26 @@ const Messages = () => {
                   🗨️ Start a conversation
                 </p>
               )}
+
               {messages.map((msg, idx) => (
                 <div
                   key={msg._id || idx}
                   className={`flex ${msg.from._id === user._id
-                      ? "justify-end"
-                      : "justify-start"
+                    ? "justify-end"
+                    : "justify-start"
                     }`}
                 >
                   <div
                     className={`px-4 py-2 rounded-2xl max-w-[70%] ${msg.from._id === user._id
-                        ? "bg-green-500 text-white"
-                        : "bg-gray-200 text-gray-800"
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-200 text-gray-800"
                       }`}
                   >
                     {msg.content}
                   </div>
                 </div>
               ))}
+
               <div ref={bottomRef} />
             </div>
 
