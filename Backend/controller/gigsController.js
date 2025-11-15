@@ -1,19 +1,23 @@
 import Gigs from "../models/Gigs.js";
 import Freelancer from "../models/Freelancer.js";
-import User from "../models/User.js";
 import cloudinary from "../config/cloudinary.js";
 
-//create gig
+
+// CREATE GIG
 export const createGig = async (req, res) => {
   try {
     const { title, description, price, deliveryTime } = req.body;
+
     const freelancer = await Freelancer.findOne({ user: req.user.id });
+
+    if (!freelancer) {
+      return res.status(400).json({ message: "Freelancer profile not found" });
+    }
 
     if (!title || !description || !price || !deliveryTime) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // handle image upload
     const images = req.files?.map((file) => ({
       url: file.path,
       public_id: file.filename
@@ -23,7 +27,7 @@ export const createGig = async (req, res) => {
       freelancer: freelancer._id,
       title,
       description,
-      price: JSON.parse(price), 
+      price: Number(price),
       deliveryTime,
       images
     });
@@ -34,24 +38,54 @@ export const createGig = async (req, res) => {
   }
 };
 
-//update gig
+
+// GET LOGGED-IN FREELANCER GIGS
+export const getMyGigs = async (req, res) => {
+  try {
+    const freelancer = await Freelancer.findOne({ user: req.user.id });
+
+    if (!freelancer) {
+      return res.status(200).json({ totalResults: 0, gigs: [] });
+    }
+
+    const gigs = await Gigs.find({ freelancer: freelancer._id })
+      .populate({
+        path: "freelancer",
+        populate: { path: "user", select: "name email" }
+      })
+      .select("-__v");
+
+    res.status(200).json({
+      totalResults: gigs.length,
+      gigs
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+// UPDATE GIG
 export const updateGig = async (req, res) => {
   try {
     const gig = await Gigs.findById(req.params.id);
     if (!gig) return res.status(404).json({ message: "Gig not found" });
 
-    if (gig.freelancer.toString() !== req.user.id.toString()) {
+    const freelancer = await Freelancer.findOne({ user: req.user.id });
+    if (!freelancer) return res.status(400).json({ message: "Freelancer not found" });
+
+    if (gig.freelancer.toString() !== freelancer._id.toString()) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
-
     let newImages = gig.images;
+
     if (req.files && req.files.length > 0) {
       for (const img of gig.images) {
         await cloudinary.uploader.destroy(img.public_id);
       }
 
-      
       newImages = req.files.map((file) => ({
         url: file.path,
         public_id: file.filename
@@ -60,7 +94,7 @@ export const updateGig = async (req, res) => {
 
     const updatedGig = await Gigs.findByIdAndUpdate(
       req.params.id,
-      { ...req.body, images: newImages },
+      { ...req.body, price: Number(req.body.price), images: newImages },
       { new: true }
     );
 
@@ -71,60 +105,57 @@ export const updateGig = async (req, res) => {
 };
 
 
-// DELETE gig
+// DELETE GIG
 export const deleteGig = async (req, res) => {
   try {
     const gig = await Gigs.findById(req.params.id);
     if (!gig) return res.status(404).json({ message: "Gig not found" });
 
-    if (gig.freelancer.toString() !== req.user.id.toString()) {
+    const freelancer = await Freelancer.findOne({ user: req.user.id });
+    if (!freelancer) return res.status(400).json({ message: "Freelancer not found" });
+
+    if (gig.freelancer.toString() !== freelancer._id.toString()) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
-    
     for (const img of gig.images) {
       await cloudinary.uploader.destroy(img.public_id);
     }
 
     await gig.deleteOne();
+
     res.json({ message: "Gig deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-//Get all gigs
+
+// GET ALL GIGS
 export const getAllGigs = async (req, res) => {
   try {
     const gigs = await Gigs.find()
       .populate({
         path: "freelancer",
-        populate: {
-          path: "user",
-          select: "name email"
-        }
+        populate: { path: "user", select: "name email" }
       })
       .select("-__v");
 
-    res.status(200).json({
-      totalResults: gigs.length,
-      gigs
-    });
+    res.status(200).json({ totalResults: gigs.length, gigs });
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-//Get gig by ID
+
+// GET GIG BY ID
 export const getGigById = async (req, res) => {
   try {
     const gig = await Gigs.findById(req.params.id)
       .populate({
         path: "freelancer",
-        populate: {
-          path: "user",
-          select: "name email"
-        }
+        populate: { path: "user", select: "name email" }
       })
       .select("-__v");
 
