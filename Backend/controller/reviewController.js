@@ -1,13 +1,12 @@
 import Review from "../models/Review.js";
 import Freelancer from "../models/Freelancer.js";
-import Gigs from "../models/Gigs.js";
 import User from "../models/User.js";
 
-// Helper: recalculate freelancer average rating
+// Recalculate freelancer rating
 const updateFreelancerRating = async (freelancerId) => {
   const reviews = await Review.find({ freelancer: freelancerId });
-  const totalReviews = reviews.length;
 
+  const totalReviews = reviews.length;
   if (totalReviews === 0) {
     await Freelancer.findByIdAndUpdate(freelancerId, {
       averageRating: 0,
@@ -25,36 +24,29 @@ const updateFreelancerRating = async (freelancerId) => {
   });
 };
 
-// Add review (works for both gig or profile)
+// Add Review
 export const addReview = async (req, res) => {
   try {
-    const { freelancerId, gigId, rating, comment } = req.body;
-    const reviewerId = req.user.id; // from authMiddleware
+    const { freelancerId, rating, comment } = req.body;
+    const reviewerId = req.user.id;
 
     // Validate freelancer
     const freelancer = await Freelancer.findById(freelancerId);
     if (!freelancer)
       return res.status(404).json({ message: "Freelancer not found" });
 
-    // Optional: check gig only if provided
-    if (gigId) {
-      const gig = await Gigs.findById(gigId);
-      if (!gig) return res.status(404).json({ message: "Gig not found" });
-    }
-
-    // Create review (gigId optional)
+    // Create review
     const review = await Review.create({
       freelancer: freelancerId,
       reviewer: reviewerId,
-      gig: gigId || null,
       rating,
       comment,
     });
 
-    // Update freelancer rating
+    // Update rating stats
     await updateFreelancerRating(freelancerId);
 
-    // Populate reviewer details (name + profileImage)
+    // Populate reviewer info
     const populatedReview = await review.populate({
       path: "reviewer",
       select: "name profileImage",
@@ -70,7 +62,7 @@ export const addReview = async (req, res) => {
   }
 };
 
-//  Get all reviews of a freelancer
+// Get All Reviews for a Freelancer
 export const getFreelancerReviews = async (req, res) => {
   try {
     const { freelancerId } = req.params;
@@ -92,23 +84,22 @@ export const getFreelancerReviews = async (req, res) => {
   }
 };
 
-// Delete review (only client who made it)
+// Delete Review
 export const deleteReview = async (req, res) => {
   try {
     const { id } = req.params;
 
     const review = await Review.findById(id);
-    if (!review) return res.status(404).json({ message: "Review not found" });
+    if (!review)
+      return res.status(404).json({ message: "Review not found" });
 
-    if (review.reviewer.toString() !== req.user.id.toString()) {
-      return res.status(403).json({ message: "Not authorized to delete this review" });
-    }
+    if (review.reviewer.toString() !== req.user.id)
+      return res.status(403).json({ message: "Not authorized" });
 
     const freelancerId = review.freelancer;
 
     await review.deleteOne();
 
-    // Recalculate ratings
     await updateFreelancerRating(freelancerId);
 
     res.status(200).json({ message: "Review deleted successfully" });

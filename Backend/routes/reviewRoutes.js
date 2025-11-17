@@ -8,7 +8,7 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 const reviewRouter = express.Router();
 
-// POST → same API for profile or gig review
+// POST → client can review freelancer
 reviewRouter.post("/", authMiddleware, addReview);
 
 // GET → show all reviews for a freelancer
